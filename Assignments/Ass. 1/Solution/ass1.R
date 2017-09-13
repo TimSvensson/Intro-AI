@@ -41,7 +41,6 @@ myCar=function(roads, car, packages) {
 
 getCarDestination=function(car) {
     mem = c(car$mem[1,1], car$mem[1,2])
-    
 }
 
 getCarPosition=function(car) {
@@ -53,15 +52,15 @@ getNextMove=function(carPos, destPos, roads) {
     direction = list(down=2, left=4, right=6, up=8, stay=5)
     
     if (carPos[1] < destPos[1]) {
-        nextMove = direction$right
+        nextMove = direction$r
     } else if (carPos[1] > destPos[1]) {
-        nextMove =  direction$left
+        nextMove =  direction$l
     } else if (carPos[2] < destPos[2]) {
-        nextMove = direction$up
+        nextMove = direction$u
     } else if (carPos[2] > destPos[2]) {
-        nextMove = direction$downs
+        nextMove = direction$d
     } else {
-        nextMove = direction$stay
+        nextMove = direction$s
     }
     
     return(nextMove)
@@ -86,7 +85,81 @@ getNonDeliveredPackages=function(packages) {
     return(rVal)
 }
 
+setClass("node",
+         slots=list(id.str="character",
+                    id.num="numeric",
+                    branches="list"))
+
+tree.toString <- function(tree) {
+    return(tree.toString.aux(0, tree))
+}
+
+tree.toString.aux <- function(level, tree) {
+    
+    if(class(tree)!="node") stop("Tree at level ", level, " is not of type 'node'")
+    
+    #print(paste("level", level))
+    #print(paste("id.str", tree@id.str))
+    #print(paste("id.num (", paste(tree@id.num, collapse = ", "), ")"))
+    #print(paste("num branches", length(tree@branches)))
+    #print("")
+    
+    for (i in 1:level) s = paste(s, " ")
+    
+    s = paste(s, "+", tree@id.num)
+    
+    if (tree@id.str!="leaf") {
+        if (length(tree@branches) > 0) {
+            for (i in 1:length(tree@branches)) {
+                s = paste("-",
+                          tree.toString.aux(level+1,
+                                            tree@branches[[i]]))
+            }
+        }
+    }
+    
+    return(s)
+}
+
+tree.create <- function(pkgs, car) {
+    root = new("node",
+               id.str   = "root",
+               id.num   = c(car$x, car$y, car$x, car$y, 0),
+               branches = list(length = nrow(pkgs)))
+    
+    for (pkg in 1:nrow(pkgs)) {
+        root@branches[[pkg]] = node.create(c(pkgs[pkg,1:5]),
+                                           pkgs[-pkg,,drop=FALSE])
+    }
+    
+    return(root)
+}
+
+node.create <- function(id.num, pkgs) {
+    node = new("node",
+               id.num=id.num,
+               branches=list(length=nrow(pkgs)))
+    
+    if (nrow(pkgs)==0) {
+        node@id.str = "leaf"
+    } else {
+        node@id.str = "node"
+        for (pkg in 1:nrow(pkgs)) {
+            node@branches[[pkg]] = node.create(pkgs[pkg,1:5,drop=TRUE],
+                                               pkgs[-pkg,,drop=FALSE])
+        }
+    }
+    
+    return(node)
+}
+
 getRoute=function(packages, car) {
+    
+    tree = tree.create(packages, car)
+    print(class(tree))
+    print(tree.toString(tree))
+    
+    stop(TRUE)
     
     numPackages = nrow(packages)
     tmpPackages = packages
