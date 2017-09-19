@@ -4,8 +4,7 @@ myCar=function(roads, car, packages) {
     # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
     # Package={source(x,y)|destination(x,y)|status(i)}
     
-    print("Packages:")
-    print(packages)
+    
     
     #print("Roads:")
     #print(roads)
@@ -19,19 +18,17 @@ myCar=function(roads, car, packages) {
     carPos = getCarPosition(car)
     destPos = getCarDestination(car)
     
-    print("carPos")
-    print(carPos)
-    print("destPos")
-    print(destPos)
-    
     # if a node stored in mem is reached, remove it
     if (carPos[1] == destPos[1] & carPos[2] == destPos[2]) {
-        car$mem = matrix(car$mem[-1,], ncol=ncol(car$mem))
+        car$mem = getRoute(packages, car)
         destPos = getCarDestination(car)
     }
     
     # find optimal path to next node in mem
     car$nextMove = getNextMove(carPos, destPos, roads)
+    
+    print("Packages:")
+    print(packages)
     
     print("Car:")
     print(car)
@@ -40,7 +37,7 @@ myCar=function(roads, car, packages) {
 }
 
 getCarDestination=function(car) {
-    mem = c(car$mem[1,1], car$mem[1,2])
+    mem = c(car$mem[1], car$mem[2])
     
 }
 
@@ -108,51 +105,54 @@ getNeighbors = function(currPos, roads) {
   
 }
 
-routeRecursive=function(packages, crntPos) {
-    
-    if (nrow(packages)==1) {
-        return(packages)
-    } else {
-        
-    }
-}
-
 getNonDeliveredPackages=function(packages) {
     rVal = packages
     for (i in 1:nrow(packages)) {
         if (rVal[i,5]!=0) {
-            rVal=matrix(rVal[-i,], ncol=nCol(rVal))
+            rVal=matrix(rVal[-i,], ncol=nCol(rVal), drop=FALSE)
         }
     }
     return(rVal)
 }
 
-getRoute=function(packages, car) {
-    
-    numPackages = nrow(packages)
-    tmpPackages = packages
-    route = matrix(nrow=2*nrow(packages), ncol=2)
-    
-    for(i in 1:numPackages) {
-        # First case is a special case, use origin of (1,1)
-        if (i==1) {
-            nextNode = getIndexOfClosestNode(tmpPackages[,1:2], c(1,1))
-        } else {
-            nextNode = getIndexOfClosestNode(tmpPackages, route[i-1,])
+packages.pickedUp = function(pkgs) {
+    for (i in 1:nrow(pkgs)) {
+        if (pkgs[i,5] == 1) {
+            return (i)
         }
-        
-        # Add pick up intersection
-        route[2*i-1,] = c(tmpPackages[nextNode,1], tmpPackages[nextNode,2])
-        # Add drop off intersection
-        route[2*i,] = c(tmpPackages[nextNode,3], tmpPackages[nextNode,4])
-        # Remove used packages
-        tmpPackages = matrix(tmpPackages[c(-nextNode),], ncol=ncol(tmpPackages))
+    }
+    return (0)
+}
+
+pkgs.toPickUp = function(pkgs) {
+    return(pkgs[pkgs[,5]==0,
+                ,
+                drop=FALSE])
+}
+
+getRoute=function(pkgs, car) {
+    
+    car.pos = c(car$x, car$y)
+    pkg.pu = packages.pickedUp(pkgs)
+    
+    if (pkg.pu > 0) {
+        return (c(pkgs[pkg.pu, 3],
+                  pkgs[pkg.pu, 4]))
     }
     
-    print("Route:")
-    print(route)
+    pkgs = pkgs.toPickUp(pkgs)
     
-    return(route)
+    pkgs.distance = vector("numeric", length=nrow(pkgs))
+    
+    for (i in 1:nrow(pkgs)) {
+        pkg.pos = c(pkgs[i,1],
+                    pkgs[i,2])
+        pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
+    }
+    
+    pkgs.min = which.min(pkgs.distance)
+    return(c(pkgs[pkgs.min, 1],
+             pkgs[pkgs.min, 2]))
 }
 
 getIndexOfClosestNode=function(pickUps, origin) {
@@ -171,8 +171,8 @@ getIndexOfClosestNode=function(pickUps, origin) {
             bestPkg = crntPkg
         } else {
             
-            crntPkgDistance = getDistance(origin, pickUps[crntPkg,])
-            bestPkgDistance = getDistance(origin, pickUps[bestPkg])
+            crntPkgDistance = getManhattanDistance(origin, pickUps[crntPkg,])
+            bestPkgDistance = getManhattanDistance(origin, pickUps[bestPkg])
             
             if (crntPkgDistance < bestPkgDistance) {
                 bestPkg = crntPkg
@@ -182,7 +182,7 @@ getIndexOfClosestNode=function(pickUps, origin) {
     return (bestPkg)
 }
 
-getDistance=function(origin, destination) {
+getManhattanDistance=function(origin, destination) {
     return ( abs(origin[1] - destination[1]) + abs(origin[2] - origin[2]) )
 }
 
