@@ -74,7 +74,7 @@ getNeighbors = function(currPos, roads) {
   rows = nrow(roads$vroads)
   if (currPos[1] == 1) {
     if( currPos[2] == 1 ) {
-      # Anropa getEdgeCost() och getHeuristics() för listan
+      # Anropa getEdgeCost() och getHeuristics() f??r listan
       neighbours = list(c(1,2), c(2,1))
       bestEdge = getEdgeCost(neighbours, currPos)
       bestHeuristic = getHeuristics(neighbours)
@@ -188,6 +188,10 @@ getManhattanDistance=function(origin, destination) {
 
 getRouteDistance=function() {}
 
+getHeuristics = function(node, goal, roads){
+  #Ta fram heuristic f??r noden
+  return (getManhattanDistance(node, goal))
+}
 #
 # Program start
 #
