@@ -49,7 +49,8 @@ getCarPosition=function(car) {
 }
 
 getNextMove=function(carPos, destPos, roads) {
-    
+  print("CARPOS")  
+  print(carPos)
     direction = list(down=2, left=4, right=6, up=8, stay=5)
     
     if (carPos[1] < destPos[1]) {
@@ -59,7 +60,7 @@ getNextMove=function(carPos, destPos, roads) {
     } else if (carPos[2] < destPos[2]) {
         nextMove = direction$up
     } else if (carPos[2] > destPos[2]) {
-        nextMove = direction$downs
+        nextMove = direction$down
     } else {
         nextMove = direction$stay
     }
@@ -67,10 +68,19 @@ getNextMove=function(carPos, destPos, roads) {
     return(nextMove)
 }
 
+getEdgeCost = function(neighbours, currPos) {
+  
+  
+}
+
 getNeighbors = function(currPos, roads) {
   rows = nrow(roads$vroads)
   if (currPos[1] == 1) {
     if( currPos[2] == 1 ) {
+      # Anropa getEdgeCost() och getHeuristics() för listan
+      neighbours = list(c(1,2), c(2,1))
+      bestEdge = getEdgeCost(neighbours, currPos)
+      bestHeuristic = getHeuristics(neighbours)
       return (list(c(1,2), c(2,1)))
     } else if (currPos[2] == rows) {
       return(list(c(1,rows-1), c(2,rows)))
