@@ -4,6 +4,8 @@ dumbDM=function(roads,car,packages){
   return (car)
 }
 basicDM=function(roads,car,packages) {
+  print(roads)
+  
   nextMove=0
   toGo=0
   offset=0
@@ -121,6 +123,37 @@ runDeliveryMan <- function (carReady=manualDM,dim=10,turns=2000,
   
   print (paste("You failed to complete the task. Try again."))
   return (NA)
+}
+
+getNeighbors = function(currPos, roads) {
+  rows = nrow(roads$vroads)
+  if (currPos[1] == 1) {
+    if( currPos[2] == 1 ) {
+      return (list(c(1,2), c(2,1)))
+    } else if (currPos[2] == rows) {
+      return(list(c(1,rows-1), c(2,rows)))
+    } else {
+      return(list(c(currPos[1]+1, currPos[2]), c(currPos[1], currPos[2]+1), c(currPos[1], currPos[2]-1)))
+    }
+  }
+  if (currPos[1] == rows) {
+    if( currPos[2] == 1 ) {
+      return (list(c(rows-1, 1), c(rows,2)))
+    } else if (currPos[2] == rows) {
+      return(list(c(rows,rows-1), c(rows)))
+    } else {
+      return(list(c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]+1), c(currPos[1], currPos[2]-1)))
+    }
+  }
+  if (currPos[2] == 1){
+    return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]+1)))
+  }  
+  if (currPos[2] == rows) {
+    return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]-1)))
+  }
+  
+  return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]-1), c(currPos[1], currPos[2]+1) ))
+  
 }
 
 packageOn<-function(x,y,packages){
