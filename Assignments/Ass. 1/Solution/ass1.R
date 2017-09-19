@@ -4,28 +4,23 @@ myCar=function(roads, car, packages) {
     # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
     # Package={source(x,y)|destination(x,y)|status(i)}
     
-    
-    
-    #print("Roads:")
-    #print(roads)
-    
     # If there is no path in mem
     if (length(car$mem) == 0) {
         # calculate optimal path and store it in mem
-        car$mem = getRoute(packages, car)
+        car$mem = car.destination.set(packages, car)
     }
     
-    carPos = getCarPosition(car)
-    destPos = getCarDestination(car)
+    car.pos = car.position.get(car)
+    dest.pos = car.destination.get(car)
     
     # if a node stored in mem is reached, remove it
-    if (carPos[1] == destPos[1] & carPos[2] == destPos[2]) {
-        car$mem = getRoute(packages, car)
-        destPos = getCarDestination(car)
+    if ((car.pos[1] == dest.pos[1] & car.pos[2] == dest.pos[2])) {
+        car$mem = car.destination.set(packages, car)
+        dest.pos = car.destination.get(car)
     }
     
     # find optimal path to next node in mem
-    car$nextMove = getNextMove(carPos, destPos, roads)
+    car$nextMove = getNextMove(car.pos, dest.pos, roads)
     
     print("Packages:")
     print(packages)
@@ -33,19 +28,135 @@ myCar=function(roads, car, packages) {
     print("Car:")
     print(car)
     
+    # print("Roads:")
+    # print(roads)
+    
     return(car)
 }
 
-getCarDestination=function(car) {
-    mem = c(car$mem[1], car$mem[2])
+#
+#   car
+#
+
+#   car.destination.set
+#   
+#   pkgs    - A package matrix
+#   car     - A car list
+#   return  - A numeric vector containing the car's new destination.
+#   
+car.destination.set = function(pkgs, car) {
     
+    car.pos = c(car$x, car$y)
+    
+    if (length(packages.get.held(pkgs)) > 0) {
+        return (package.get.dropOff.position(packages.get.held(pkgs)))
+    }
+    
+    pkgs = packages.get.pickUp(pkgs)
+    
+    pkgs.distance = vector("numeric", length=nrow(pkgs))
+    
+    for (i in 1:nrow(pkgs)) {
+        pkg.pos = c(pkgs[i,1],
+                    pkgs[i,2])
+        pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
+    }
+    
+    pkgs.min = which.min(pkgs.distance)
+    return(c(pkgs[pkgs.min, 1],
+             pkgs[pkgs.min, 2]))
 }
 
-getCarPosition=function(car) {
+#   car.destination.get
+#
+#   car     - The car list
+#   return  - A numeric vector containing the car's destination.
+#   
+car.destination.get = function(car) {
+    return(c(car$mem[1], car$mem[2]))
+}
+
+#   car.position.get
+#   
+#   car     - The car list
+#   return  - A numeric vector containing the car's position.
+#   
+car.position.get = function(car) {
     return (c(car$x, car$y))
 }
 
-getNextMove=function(carPos, destPos, roads) {
+#
+#   car end
+#
+
+#
+#   packages
+#
+
+#   packages.get.delivered
+#   
+#   pkgs    - A package matrix
+#   Return  - All rows containing packages that have been delivered.
+#   
+packages.get.delivered=function(packages) {
+    return(pkgs[pkgs[,5]==2,
+                ,
+                drop=FALSE])
+}
+
+#   packages.get.held
+#   
+#   pkgs    - A package matrix
+#   return  - All rows containing packages that are held in the car.
+#   
+packages.get.held = function(pkgs) {
+    return(pkgs[pkgs[,5]==1,
+                ,
+                drop=FALSE])
+}
+
+#   packages.get.pickUp
+#   
+#   pkgs    - A package matrix
+#   return  - All rows containing packages that are to be picked up.
+#   
+packages.get.pickUp = function(pkgs) {
+    return(pkgs[pkgs[,5]==0,
+                ,
+                drop=FALSE])
+}
+
+#
+#   packages end
+#
+
+#
+#   package
+#
+
+#   package.get.pickUp.position
+#
+#   pkg     - A numeric vector representing a package.
+#   return  - A numeric vector representing the pick up position.
+package.get.pickUp.position = function(pkg) {
+    return(c(pkg[1],
+             pkg[2]))
+}
+
+#   package.get.dropOff.position
+#
+#   pkg     - A numeric vector representing a package.
+#   return  - A numeric vector representing the drop off position.
+package.get.dropOff.position = function(pkg) {
+    return(c(pkg[3],
+             pkg[4]))
+}
+
+#
+#   package end
+#
+
+getNextMove = function(carPos, destPos, roads) {
   print("CARPOS")  
   print(carPos)
     direction = list(down=2, left=4, right=6, up=8, stay=5)
@@ -105,83 +216,6 @@ getNeighbors = function(currPos, roads) {
   
 }
 
-getNonDeliveredPackages=function(packages) {
-    rVal = packages
-    for (i in 1:nrow(packages)) {
-        if (rVal[i,5]!=0) {
-            rVal=matrix(rVal[-i,], ncol=nCol(rVal), drop=FALSE)
-        }
-    }
-    return(rVal)
-}
-
-packages.pickedUp = function(pkgs) {
-    for (i in 1:nrow(pkgs)) {
-        if (pkgs[i,5] == 1) {
-            return (i)
-        }
-    }
-    return (0)
-}
-
-pkgs.toPickUp = function(pkgs) {
-    return(pkgs[pkgs[,5]==0,
-                ,
-                drop=FALSE])
-}
-
-getRoute=function(pkgs, car) {
-    
-    car.pos = c(car$x, car$y)
-    pkg.pu = packages.pickedUp(pkgs)
-    
-    if (pkg.pu > 0) {
-        return (c(pkgs[pkg.pu, 3],
-                  pkgs[pkg.pu, 4]))
-    }
-    
-    pkgs = pkgs.toPickUp(pkgs)
-    
-    pkgs.distance = vector("numeric", length=nrow(pkgs))
-    
-    for (i in 1:nrow(pkgs)) {
-        pkg.pos = c(pkgs[i,1],
-                    pkgs[i,2])
-        pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
-    }
-    
-    pkgs.min = which.min(pkgs.distance)
-    return(c(pkgs[pkgs.min, 1],
-             pkgs[pkgs.min, 2]))
-}
-
-getIndexOfClosestNode=function(pickUps, origin) {
-    
-    print("pick ups")
-    print(pickUps)
-    print("origin")
-    print(origin)
-    
-    bestPkg = -1
-    
-    if (is.vector(pickUps) == TRUE) return(1)
-    
-    for (crntPkg in 1:nrow(as.matrix(pickUps))) {
-        if (bestPkg == -1) {
-            bestPkg = crntPkg
-        } else {
-            
-            crntPkgDistance = getManhattanDistance(origin, pickUps[crntPkg,])
-            bestPkgDistance = getManhattanDistance(origin, pickUps[bestPkg])
-            
-            if (crntPkgDistance < bestPkgDistance) {
-                bestPkg = crntPkg
-            }
-        }
-    }
-    return (bestPkg)
-}
-
 getManhattanDistance=function(origin, destination) {
     return ( abs(origin[1] - destination[1]) + abs(origin[2] - origin[2]) )
 }
@@ -192,6 +226,7 @@ getHeuristics = function(node, goal, roads){
   #Ta fram heuristic f??r noden
   return (getManhattanDistance(node, goal))
 }
+
 #
 # Program start
 #
