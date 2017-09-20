@@ -14,7 +14,7 @@ print("vroadsh is:")
 print(vroads)
 print("currentPos is:")
 print(currentPos)
-
+print("det nya")
 for (i in neighbours) {
   
   print("i is:")
