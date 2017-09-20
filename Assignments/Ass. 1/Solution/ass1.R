@@ -105,6 +105,157 @@ getNeighbors = function(currPos, roads) {
   
 }
 
+#
+#   package end
+#
+
+#
+#   frontier
+#
+
+#
+#   frontier
+#   
+#   The frontier matrix is an ordered set of nodes where the top node (the first
+#   row in the matrix) is the next best step in the A* algorithm.
+#   
+#   Example:
+#   
+#           [,1]    [,2]    [,3]    [,4]    [,5]
+#   [1,]    a1      b1      c1      d1      f1
+#   [2,]    a2      b2      c2      d2      f2
+#   [3,]    ...
+#
+#   Where
+#       (aN, bN) is the current node in question,
+#       (cN, dN) is the node that has the cheapest path to the current node, and
+#       fN is the A* cost related to the node.
+#       
+#   The matrix will always be ordered after the value of f, the lowest value of f
+#   will be at the top of the matrix.
+#
+
+#   frontier.get
+#
+#   frontier    - A frontier matrix, the old frontier.
+#   nodes       - A frontier matrix, new nodes to be added to the frontier.
+#   return      - A frontier matrix, the new frontier with the nodes matrix added.
+#
+frontier.get = function(frontier.old, nodes) {
+  
+  # 1. find and resolve doubles
+  for (i in nrow(frontier.old):1) {
+    for (j in nrow(nodes):1) {
+      if (frontier.node.current.equals(frontier.old[i,], nodes[j,])) {
+        if (frontier.old[i,5] > nodes[j,5]) {
+          frontier.old[i,] = c(0,0,0,0,-1)
+        } else {
+          nodes[j,] = c(0,0,0,0,-1)
+        }
+        break;
+      }
+    }
+  }
+  
+  print("frontier.old")
+  print(frontier.old)
+  
+  print("nodes")
+  print(nodes)
+  
+  frontier.old = frontier.remove.zeroRows(frontier.old)
+  nodes = frontier.remove.zeroRows(nodes)
+  
+  print("frontier.old")
+  print(frontier.old)
+  
+  print("nodes")
+  print(nodes)
+  
+  # 2. create new frontier matrix big enough for all nodes
+  
+  
+  # 3. fill and sort the new frontier matrix with all nodes
+  
+  #return (frontier.new)
+}
+
+frontier.node.current.equals = function(a, b) {
+  return(
+    a[1] == b[1] & a[2] == b[2]
+  )
+}
+
+frontier.remove.zeroRows = function(m) {
+  for (i in NROW(m):1) {
+    print("m")
+    print(m)
+    if (frontier.is.zeroRow(m[1,])) {
+      m=m[-i,,drop=FALSE]
+    }
+  }
+  return(m)
+}
+
+frontier.is.zeroRow = function(row) {
+  
+  row.zero = c(0,0,0,0,-1)
+  
+  if (identical(row, row.zero)) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+frontier.test = function() {
+  frontier.old = matrix(1:20,ncol=5,byrow=TRUE)
+  nodes = matrix(c(1,2,5,6,2,
+                   6,7,1,2,10,
+                   2,3,4,5,5),
+                 ncol=5,
+                 byrow=TRUE)
+  
+  print("frontier.old")
+  print(frontier.old)
+  
+  print("nodes")
+  print(nodes)
+  
+  frontier.new = frontier.get(frontier.old, nodes)
+  
+  print("frontier.new")
+  print(frontier.new)
+}
+
+#
+#   frontier end
+#
+
+#Creates the visited vector
+visited.create = function(){
+  visited.h = vector("numeric", 10)
+}
+
+#Adds a new element
+visited.add = function(visited.h, index){
+  for (i in 1:length(visited.h))
+    vector[i] <- values[i]
+  return (visited.h)
+}
+
+#The function
+visited = function(){
+  node.visited = visited.h[0]
+  visited.clean
+  return (ret)
+}
+
+#Cleans the vector
+visited.clean = function(){
+  visited.h = NULL
+}
+
 getNonDeliveredPackages=function(packages) {
     rVal = packages
     for (i in 1:nrow(packages)) {
