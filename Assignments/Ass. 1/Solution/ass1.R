@@ -410,9 +410,21 @@ getManhattanDistance=function(origin, destination) {
 
 getRouteDistance=function() {}
 
-getHeuristics = function(node, goal, roads){
+getHeuristicsAUX = function(node, goal, roads){
   #Ta fram heuristic f??r noden
-  return (getManhattanDistance(node, goal))
+  return (getManhattanDistance(node, goal)* mean(roads))
+}
+
+getHeuristics = function(neighbours, goal, roads){
+  #Ta fram heuristic f??r noden
+  
+  neighbours.h = vector("numeric", length = length(neighbours))
+  
+  for(i in 1:lenght(neighbours)) {
+    neighbours.h[i] = (getHeuristicsAUX(neighbours[i], goal, roads))
+  }
+  
+  return (neighbours.h)
 }
 
 #
