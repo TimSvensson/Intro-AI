@@ -202,28 +202,76 @@ frontier.get = function(frontier.old, nodes) {
             }
         }
     }
-    
-    print("frontier.old")
-    print(frontier.old)
-    
-    print("nodes")
-    print(nodes)
-    
     frontier.old = frontier.remove.zeroRows(frontier.old)
     nodes = frontier.remove.zeroRows(nodes)
     
+    # 2. create new frontier matrix big enough for all nodes
+    frontier.new.nrows = nrow(frontier.old) + nrow(nodes)
+    frontier.new = matrix(nrow=frontier.new.nrows,
+                          ncol=ncol(frontier.old))
+    
+    # 3. fill and sort the new frontier matrix with all nodes
+    
     print("frontier.old")
     print(frontier.old)
     
     print("nodes")
     print(nodes)
     
-    # 2. create new frontier matrix big enough for all nodes
+    while (i <= frontier.new.nrows) {
+        
+        print(paste("i", i))
+        
+        old.best = frontier.get.best(frontier.old)
+        nodes.best = frontier.get.best(nodes)
+        
+        print("old")
+        print(old.best)
+        
+        print("node")
+        print(nodes.best)
+        
+        if (frontier.better(old.best, nodes.best)) {
+            frontier.new[i,] = old.best
+            frontier.old = frontier.remove.row(frontier.old, old.best)
+        } else {
+            frontier.new[i,] = nodes.best
+            nodes = frontier.remove.row(nodes, nodes.best)
+        }
+        
+        i = i + 1
+    }
     
+    return (frontier.new)
+}
+
+#   frontier.remove.row
+#
+#   Comment:
+#       If f does not contain a row identical to r, f will be returned without
+#       modification.
+#
+#   f       - The frontier matrix
+#   r       - The row to be removed
+#   return  - f without the row r
+#
+frontier.remove.row = function(f, r) {
+    for (i in 1:nrow(f)) {
+        if (identical(f[i,], r)) {
+            return(f[-i,
+                     ,
+                     drop=FALSE])
+        }
+    }
+    return(f)
+}
+
+frontier.better = function(a, b) {
+    if (length(a) == 0) return(FALSE)
+    if (length(b) == 0) return(TRUE)
+    if (a[5] < b[5]) return(TRUE)
     
-    # 3. fill and sort the new frontier matrix with all nodes
-    
-    #return (frontier.new)
+    return(FALSE)
 }
 
 frontier.node.current.equals = function(a, b) {
@@ -233,11 +281,15 @@ frontier.node.current.equals = function(a, b) {
 }
 
 frontier.remove.zeroRows = function(m) {
-    for (i in NROW(m):1) {
-        print("m")
-        print(m)
-        if (frontier.is.zeroRow(m[1,])) {
-            m=m[-i,,drop=FALSE]
+
+    row.current = 1
+    while (row.current <= nrow(m)) {
+        if (frontier.is.zeroRow(m[row.current,])) {
+            m=m[-row.current,
+                ,
+                drop=FALSE]
+        } else {
+            row.current = row.current + 1
         }
     }
     return(m)
@@ -248,10 +300,16 @@ frontier.is.zeroRow = function(row) {
     row.zero = c(0,0,0,0,-1)
     
     if (identical(row, row.zero)) {
-        return(TRUE)
+        r = TRUE
     } else {
-        return(FALSE)
+        r = FALSE
     }
+
+    return(r)
+}
+
+frontier.get.best = function(f) {
+    return(f[which.min(f[,5]),])
 }
 
 frontier.test = function() {
@@ -262,14 +320,22 @@ frontier.test = function() {
                    ncol=5,
                    byrow=TRUE)
     
-    print("frontier.old")
-    print(frontier.old)
-    
-    print("nodes")
-    print(nodes)
-    
     frontier.new = frontier.get(frontier.old, nodes)
     
+    print("================")
+    print("RESULT FROM TEST")
+    print("================")
+    print("")
+    print("Inputs:")
+    print("")
+    print("frontier.old")
+    print(frontier.old)
+    print("")
+    print("nodes")
+    print(nodes)
+    print("")
+    print("Results:")
+    print("")
     print("frontier.new")
     print(frontier.new)
 }
