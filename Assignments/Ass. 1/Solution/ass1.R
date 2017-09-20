@@ -420,7 +420,7 @@ getHeuristics = function(neighbours, goal, roads){
   
   neighbours.h = vector("numeric", length = length(neighbours))
   
-  for(i in 1:lenght(neighbours)) {
+  for(i in 1:length(neighbours)) {
     neighbours.h[i] = (getHeuristicsAUX(neighbours[i], goal, roads))
   }
   
