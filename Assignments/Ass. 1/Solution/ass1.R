@@ -476,16 +476,9 @@ getNeighbors = function(currPos, roads) {
 }
 
 getManhattanDistance=function(node, goal) {
-  print(node)
-  print(goal)
+
   xDifference = abs(node[1] - goal[1]) 
   yDifference = abs(node[2] - goal[2])
-  
-  print("X Diff:")
-  print(xDifference)
-  
-  print("Y Diff:")
-  print(yDifference)
   
   if (xDifference == 0 && yDifference == 0) {
     zero = 0
@@ -499,8 +492,6 @@ getManhattanDistance=function(node, goal) {
     yDifference = xDifference
   }
   manhat = xDifference + yDifference
-  print("Manhattan:")
-  print(manhat)
   return (manhat)
 }
 
@@ -520,8 +511,6 @@ getHeuristics = function(neighbours, goal, roads){
     neigh = getHeuristicsAUX(neighbours[[i]], dest, roads)
     neighbours.h[i] <- neigh
   }
-  print("Final:")
-  print(neighbours.h)
   return (neighbours.h)
 }
 
