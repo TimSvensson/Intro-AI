@@ -232,28 +232,30 @@ frontier.test = function() {
 #   frontier end
 #
 
-#Creates the visited vector
+#Creates the visited matrix
 visited.create = function(){
-  visited.h = vector("numeric", 10)
+  visited.h = matrix(0, nrow = 100, ncol = 5)
 }
 
 #Adds a new element
-visited.add = function(visited.h, index){
-  for (i in 1:length(visited.h))
-    vector[i] <- values[i]
-  return (visited.h)
+visited.add = function(matrix, visited.h){
+  rbing(matrix, visited.h)
+  return (matix)
 }
 
 #The function
-visited = function(){
+visited = function(matrix){
+  visited.h = vector("numeric", length = 100)
+  visited.h = nrow(matrix)
   node.visited = visited.h[0]
-  visited.clean
-  return (ret)
+  visited.clean(matrix, visited.h)
+  return (node.visited)
 }
 
-#Cleans the vector
-visited.clean = function(){
+#Cleans the matrix
+visited.clean = function(matrix, visited.h){
   visited.h = NULL
+  matrix = NULL
 }
 
 getNonDeliveredPackages=function(packages) {
