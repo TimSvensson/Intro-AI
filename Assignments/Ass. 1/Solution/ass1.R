@@ -1,5 +1,4 @@
-myCar=function(roads, car, packages) {
-
+myCar = function(roads, car, packages) {
     # roads={matrix(hroads)|matrix(vroads)}
     # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
     # Package={source(x,y)|destination(x,y)|status(i)}
@@ -39,13 +38,12 @@ myCar=function(roads, car, packages) {
 #
 
 #   car.destination.set
-#   
+#
 #   pkgs    - A package matrix
 #   car     - A car list
 #   return  - A numeric vector containing the car's new destination.
-#   
+#
 car.destination.set = function(pkgs, car) {
-    
     car.pos = c(car$x, car$y)
     
     if (length(packages.get.held(pkgs)) > 0) {
@@ -54,32 +52,32 @@ car.destination.set = function(pkgs, car) {
     
     pkgs = packages.get.pickUp(pkgs)
     
-    pkgs.distance = vector("numeric", length=nrow(pkgs))
+    pkgs.distance = vector("numeric", length = nrow(pkgs))
     
     for (i in 1:nrow(pkgs)) {
-        pkg.pos = c(pkgs[i,1],
-                    pkgs[i,2])
+        pkg.pos = c(pkgs[i, 1],
+                    pkgs[i, 2])
         pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
     }
     
     pkgs.min = which.min(pkgs.distance)
-    return(package.get.pickUp.position(pkgs[pkgs.min,]))
+    return(package.get.pickUp.position(pkgs[pkgs.min, ]))
 }
 
 #   car.destination.get
 #
 #   car     - The car list
 #   return  - A numeric vector containing the car's destination.
-#   
+#
 car.destination.get = function(car) {
     return(c(car$mem[1], car$mem[2]))
 }
 
 #   car.position.get
-#   
+#
 #   car     - The car list
 #   return  - A numeric vector containing the car's position.
-#   
+#
 car.position.get = function(car) {
     return (c(car$x, car$y))
 }
@@ -93,36 +91,36 @@ car.position.get = function(car) {
 #
 
 #   packages.get.delivered
-#   
+#
 #   pkgs    - A package matrix
 #   Return  - All rows containing packages that have been delivered.
-#   
-packages.get.delivered=function(packages) {
-    return(pkgs[pkgs[,5]==2,
+#
+packages.get.delivered = function(packages) {
+    return(pkgs[pkgs[, 5] == 2,
                 ,
-                drop=FALSE])
+                drop = FALSE])
 }
 
 #   packages.get.held
-#   
+#
 #   pkgs    - A package matrix
 #   return  - All rows containing packages that are held in the car.
-#   
+#
 packages.get.held = function(pkgs) {
-    return(pkgs[pkgs[,5]==1,
+    return(pkgs[pkgs[, 5] == 1,
                 ,
-                drop=FALSE])
+                drop = FALSE])
 }
 
 #   packages.get.pickUp
-#   
+#
 #   pkgs    - A package matrix
 #   return  - All rows containing packages that are to be picked up.
-#   
+#
 packages.get.pickUp = function(pkgs) {
-    return(pkgs[pkgs[,5]==0,
+    return(pkgs[pkgs[, 5] == 0,
                 ,
-                drop=FALSE])
+                drop = FALSE])
 }
 
 #
@@ -161,12 +159,12 @@ package.get.dropOff.position = function(pkg) {
 
 #
 #   frontier
-#   
+#
 #   The frontier matrix is an ordered set of nodes where the top node (the first
 #   row in the matrix) is the next best step in the A* algorithm.
-#   
+#
 #   Example:
-#   
+#
 #           [,1]    [,2]    [,3]    [,4]    [,5]
 #   [1,]    a1      b1      c1      d1      f1
 #   [2,]    a2      b2      c2      d2      f2
@@ -176,29 +174,32 @@ package.get.dropOff.position = function(pkg) {
 #       (aN, bN) is the current node in question,
 #       (cN, dN) is the node that has the cheapest path to the current node, and
 #       fN is the A* cost related to the node.
-#       
+#
 #   The matrix will always be ordered after the value of f, the lowest value of f
 #   will be at the top of the matrix.
 #
 
-#   frontier.get
-#
-#   frontier    - A frontier matrix, the old frontier.
-#   nodes       - A frontier matrix, new nodes to be added to the frontier.
-#   return      - A frontier matrix, the new frontier with the nodes matrix added.
-#
+#' frontier.get
+#'
+#' @param frontier.old A frontier matrix, the old frontier.
+#' @param nodes A frontier matrix, new nodes to be added to the frontier.
+#'
+#' @return A frontier matrix, the new frontier with the nodes matrix added.
+#' @export
+#'
+#' @examples
 frontier.get = function(frontier.old, nodes) {
-    
     # 1. find and resolve doubles
     for (i in nrow(frontier.old):1) {
         for (j in nrow(nodes):1) {
-            if (frontier.node.current.equals(frontier.old[i,], nodes[j,])) {
-                if (frontier.old[i,5] > nodes[j,5]) {
-                    frontier.old[i,] = c(0,0,0,0,-1)
+            if (frontier.node.current.equals(frontier.old[i, ], nodes[j, ])) {
+                if (frontier.old[i, 5] > nodes[j, 5]) {
+                    frontier.old[i, ] = c(0, 0, 0, 0, -1)
                 } else {
-                    nodes[j,] = c(0,0,0,0,-1)
+                    nodes[j, ] = c(0, 0, 0, 0, -1)
                 }
-                break;
+                break
+                
             }
         }
     }
@@ -207,8 +208,8 @@ frontier.get = function(frontier.old, nodes) {
     
     # 2. create new frontier matrix big enough for all nodes
     frontier.new.nrows = nrow(frontier.old) + nrow(nodes)
-    frontier.new = matrix(nrow=frontier.new.nrows,
-                          ncol=ncol(frontier.old))
+    frontier.new = matrix(nrow = frontier.new.nrows,
+                          ncol = ncol(frontier.old))
     
     # 3. fill and sort the new frontier matrix with all nodes
     
@@ -219,7 +220,6 @@ frontier.get = function(frontier.old, nodes) {
     print(nodes)
     
     while (i <= frontier.new.nrows) {
-        
         print(paste("i", i))
         
         old.best = frontier.get.best(frontier.old)
@@ -232,10 +232,10 @@ frontier.get = function(frontier.old, nodes) {
         print(nodes.best)
         
         if (frontier.better(old.best, nodes.best)) {
-            frontier.new[i,] = old.best
+            frontier.new[i, ] = old.best
             frontier.old = frontier.remove.row(frontier.old, old.best)
         } else {
-            frontier.new[i,] = nodes.best
+            frontier.new[i, ] = nodes.best
             nodes = frontier.remove.row(nodes, nodes.best)
         }
         
@@ -245,49 +245,75 @@ frontier.get = function(frontier.old, nodes) {
     return (frontier.new)
 }
 
-#   frontier.remove.row
-#
-#   Comment:
-#       If f does not contain a row identical to r, f will be returned without
-#       modification.
-#
-#   f       - The frontier matrix
-#   r       - The row to be removed
-#   return  - f without the row r
-#
+#' frontier.remove.row
+#'
+#' @param f The frontier matrix
+#' @param r The row to be removed
+#'
+#' @return f without the row r
+#' @export
+#'
+#' @examples
 frontier.remove.row = function(f, r) {
     for (i in 1:nrow(f)) {
-        if (identical(f[i,], r)) {
+        if (identical(f[i, ], r)) {
             return(f[-i,
                      ,
-                     drop=FALSE])
+                     drop = FALSE])
         }
     }
     return(f)
 }
 
+
+#' frontier.better
+#'
+#' @param a A row from a frontier matrix
+#' @param b A row from a frontier matrix
+#'
+#' @return TRUE if a's f-value is lower than b's, otherwise false.
+#' @export
+#'
+#' @examples
 frontier.better = function(a, b) {
-    if (length(a) == 0) return(FALSE)
-    if (length(b) == 0) return(TRUE)
-    if (a[5] < b[5]) return(TRUE)
+    if (length(a) == 0)
+        return(FALSE)
+    if (length(b) == 0)
+        return(TRUE)
+    if (a[5] < b[5])
+        return(TRUE)
     
     return(FALSE)
 }
 
-frontier.node.current.equals = function(a, b) {
-    return(
-        a[1] == b[1] & a[2] == b[2]
-    )
+#' frontier.node.current.equals
+#'
+#' @param row.a A row from a frontier matrix
+#' @param row.b A row from a frontier matrix
+#'
+#' @return TRUE if a's current node is identical to b's current node.
+#' @export
+#'
+#' @examples
+frontier.node.current.equals = function(row.a, row.b) {
+    return(identical(row.a[1:2], row.b[1:2]))
 }
 
+#' frontier.remove.zeroRows
+#'
+#' @param m A frontier matrix
+#'
+#' @return m without with any zero valued rows removed.
+#' @export
+#'
+#' @examples
 frontier.remove.zeroRows = function(m) {
-
     row.current = 1
     while (row.current <= nrow(m)) {
-        if (frontier.is.zeroRow(m[row.current,])) {
-            m=m[-row.current,
-                ,
-                drop=FALSE]
+        if (frontier.is.zeroRow(m[row.current, ])) {
+            m = m[-row.current,
+                  ,
+                  drop = FALSE]
         } else {
             row.current = row.current + 1
         }
@@ -295,30 +321,51 @@ frontier.remove.zeroRows = function(m) {
     return(m)
 }
 
+#' frontier.is.zeroRow
+#'
+#' @param row A row from a frontier matrix
+#'
+#' @return TRUE if the row is a zero valued row.
+#' @export
+#'
+#' @examples
 frontier.is.zeroRow = function(row) {
-    
-    row.zero = c(0,0,0,0,-1)
+    row.zero = c(0, 0, 0, 0, -1)
     
     if (identical(row, row.zero)) {
         r = TRUE
     } else {
         r = FALSE
     }
-
+    
     return(r)
 }
 
+#' frontier.get.best
+#'
+#' @param f A frontier matrix
+#'
+#' @return The row in f which has the lowest f-value.
+#' @export
+#'
+#' @examples
 frontier.get.best = function(f) {
-    return(f[which.min(f[,5]),])
+    return(f[which.min(f[, 5]), ])
 }
 
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
 frontier.test = function() {
-    frontier.old = matrix(1:20,ncol=5,byrow=TRUE)
-    nodes = matrix(c(1,2,5,6,2,
-                     6,7,1,2,10,
-                     2,3,4,5,5),
-                   ncol=5,
-                   byrow=TRUE)
+    frontier.old = matrix(1:20, ncol = 5, byrow = TRUE)
+    nodes = matrix(c(1, 2, 5, 6, 2,
+                     6, 7, 1, 2, 10,
+                     2, 3, 4, 5, 5),
+                   ncol = 5,
+                   byrow = TRUE)
     
     frontier.new = frontier.get(frontier.old, nodes)
     
@@ -345,9 +392,13 @@ frontier.test = function() {
 #
 
 getNextMove = function(carPos, destPos, roads) {
-  print("CARPOS")  
-  print(carPos)
-    direction = list(down=2, left=4, right=6, up=8, stay=5)
+    direction = list(
+        down = 2,
+        left = 4,
+        right = 6,
+        up = 8,
+        stay = 5
+    )
     
     if (carPos[1] < destPos[1]) {
         nextMove = direction$right
@@ -365,68 +416,88 @@ getNextMove = function(carPos, destPos, roads) {
 }
 
 getEdgeCost = function(neighbours, currPos) {
-  
-  
+    
 }
 
 getNeighbors = function(currPos, roads) {
-  rows = nrow(roads$vroads)
-  if (currPos[1] == 1) {
-    if( currPos[2] == 1 ) {
-      # Anropa getEdgeCost() och getHeuristics() f??r listan
-      neighbours = list(c(1,2), c(2,1))
-      bestEdge = getEdgeCost(neighbours, currPos)
-      bestHeuristic = getHeuristics(neighbours)
-      return (list(c(1,2), c(2,1)))
-    } else if (currPos[2] == rows) {
-      return(list(c(1,rows-1), c(2,rows)))
-    } else {
-      return(list(c(currPos[1]+1, currPos[2]), c(currPos[1], currPos[2]+1), c(currPos[1], currPos[2]-1)))
+    rows = nrow(roads$vroads)
+    if (currPos[1] == 1) {
+        if (currPos[2] == 1) {
+            # Anropa getEdgeCost() och getHeuristics() f??r listan
+            neighbours = list(c(1, 2), c(2, 1))
+            bestEdge = getEdgeCost(neighbours, currPos)
+            bestHeuristic = getHeuristics(neighbours)
+            return (list(c(1, 2), c(2, 1)))
+        } else if (currPos[2] == rows) {
+            return(list(c(1, rows - 1), c(2, rows)))
+        } else {
+            return(list(
+                c(currPos[1] + 1, currPos[2]),
+                c(currPos[1], currPos[2] + 1),
+                c(currPos[1], currPos[2] - 1)
+            ))
+        }
     }
-  }
-  if (currPos[1] == rows) {
-    if( currPos[2] == 1 ) {
-      return (list(c(rows-1, 1), c(rows,2)))
-    } else if (currPos[2] == rows) {
-      return(list(c(rows,rows-1), c(rows)))
-    } else {
-      return(list(c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]+1), c(currPos[1], currPos[2]-1)))
+    if (currPos[1] == rows) {
+        if (currPos[2] == 1) {
+            return (list(c(rows - 1, 1), c(rows, 2)))
+        } else if (currPos[2] == rows) {
+            return(list(c(rows, rows - 1), c(rows)))
+        } else {
+            return(list(
+                c(currPos[1] - 1, currPos[2]),
+                c(currPos[1], currPos[2] + 1),
+                c(currPos[1], currPos[2] - 1)
+            ))
+        }
     }
-  }
-  if (currPos[2] == 1){
-    return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]+1)))
-  }  
-  if (currPos[2] == rows) {
-    return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]-1)))
-  }
-  
-  return(list(c(currPos[1]+1, currPos[2]), c(currPos[1]-1, currPos[2]), c(currPos[1], currPos[2]-1), c(currPos[1], currPos[2]+1) ))
-  
+    if (currPos[2] == 1) {
+        return(list(
+            c(currPos[1] + 1, currPos[2]),
+            c(currPos[1] - 1, currPos[2]),
+            c(currPos[1], currPos[2] + 1)
+        ))
+    }
+    if (currPos[2] == rows) {
+        return(list(
+            c(currPos[1] + 1, currPos[2]),
+            c(currPos[1] - 1, currPos[2]),
+            c(currPos[1], currPos[2] - 1)
+        ))
+    }
+    
+    return(list(
+        c(currPos[1] + 1, currPos[2]),
+        c(currPos[1] - 1, currPos[2]),
+        c(currPos[1], currPos[2] - 1),
+        c(currPos[1], currPos[2] + 1)
+    ))
+    
 }
 
-getManhattanDistance=function(node, goal) {
-  manhat = abs(node[1] - goal[1]) + abs(node[2] - goal[2])
-  return (manhat)
+getManhattanDistance = function(node, goal) {
+    manhat = abs(node[1] - goal[1]) + abs(node[2] - goal[2])
+    return (manhat)
 }
 
-getHeuristicsAUX = function(node, goal, roads){
-  #Get heuristic of a node
-  aux = getManhattanDistance(org, dest)
-  aux = aux * ((mean(roads[1]) + mean(roads[2]))/2)
-  return (aux)
+getHeuristicsAUX = function(node, goal, roads) {
+    #Get heuristic of a node
+    aux = getManhattanDistance(org, dest)
+    aux = aux * ((mean(roads[1]) + mean(roads[2])) / 2)
+    return (aux)
 }
 
-getHeuristics = function(neighbours, goal, roads){
-  #Get the total heuristic
-  
-  neighbours.h = vector("numeric", length = length(neighbours))
-  
-  for(i in 1:length(neighbours)) {
-    neigh = getHeuristicsAUX(neighbours[i], dest, roads)
-    neighbours.h[i] <- neigh
-  }
-  
-  return (neighbours.h)
+getHeuristics = function(neighbours, goal, roads) {
+    #Get the total heuristic
+    
+    neighbours.h = vector("numeric", length = length(neighbours))
+    
+    for (i in 1:length(neighbours)) {
+        neigh = getHeuristicsAUX(neighbours[i], dest, roads)
+        neighbours.h[i] <- neigh
+    }
+    
+    return (neighbours.h)
 }
 
 #
