@@ -63,7 +63,7 @@ car.destination.set = function(pkgs, car) {
     }
     
     pkgs.min = which.min(pkgs.distance)
-    return(package.get.pickUp.position(pkgs[,pkgs.min]))
+    return(package.get.pickUp.position(pkgs[pkgs.min,]))
 }
 
 #   car.destination.get
@@ -430,9 +430,9 @@ getHeuristics = function(neighbours, goal, roads){
 #
 #   Run tests
 #
-frontier.test()
+#frontier.test()
 
 #
 # Program start
 #
-# runDeliveryMan(myCar)
+runDeliveryMan(myCar)
