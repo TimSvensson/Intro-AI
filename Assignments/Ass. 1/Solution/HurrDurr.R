@@ -8,23 +8,14 @@ roads = c(hroads, vroads)
 g = c()
 
 getManhattanDistance=function(node, goal) {
-  print("Manhattan")
-  print("Goal")
-  print(goal)
-  print("Node")
-  print(node)
-  
   manhat = abs(node[1] - goal[1]) + abs(node[2] - goal[2])
-  print(manhat)
   return (manhat)
 }
 
 getHeuristicsAUX = function(node, goal, roads){
   #Ta fram heuristic f??r noden
-  print("AUX")
   aux = getManhattanDistance(org, dest)
   aux = aux * ((mean(roads[1]) + mean(roads[2]))/2)
-  print(aux)
   return (aux)
 }
 
@@ -38,11 +29,10 @@ getHeuristics = function(neighbours, goal, roads){
     neighbours.h[i] <- neigh
   }
   
-  print("Heuristic")
-  print(neighbours.h)
   return (neighbours.h)
 }
 
 # If x or y value > currentPos then move right or up
 # If x or y value < currentPos then move left or down
 
+getManhattanDistance(org, dest)
