@@ -404,24 +404,26 @@ getNeighbors = function(currPos, roads) {
   
 }
 
-getManhattanDistance=function(origin, destination) {
-    return ( abs(origin[1] - destination[1]) + abs(origin[2] - origin[2]) )
+getManhattanDistance=function(node, goal) {
+  manhat = abs(node[1] - goal[1]) + abs(node[2] - goal[2])
+  return (manhat)
 }
 
-getRouteDistance=function() {}
-
 getHeuristicsAUX = function(node, goal, roads){
-  #Ta fram heuristic f??r noden
-  return (getManhattanDistance(node, goal)* mean(roads))
+  #Get heuristic of a node
+  aux = getManhattanDistance(org, dest)
+  aux = aux * ((mean(roads[1]) + mean(roads[2]))/2)
+  return (aux)
 }
 
 getHeuristics = function(neighbours, goal, roads){
-  #Ta fram heuristic f??r noden
+  #Get the total heuristic
   
   neighbours.h = vector("numeric", length = length(neighbours))
   
   for(i in 1:length(neighbours)) {
-    neighbours.h[i] = (getHeuristicsAUX(neighbours[i], goal, roads))
+    neigh = getHeuristicsAUX(neighbours[i], dest, roads)
+    neighbours.h[i] <- neigh
   }
   
   return (neighbours.h)
