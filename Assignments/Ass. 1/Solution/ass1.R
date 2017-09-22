@@ -532,30 +532,45 @@ getNeighbors = function(currPos, roads) {
     
 }
 
-getManhattanDistance = function(node, goal) {
-    manhat = abs(node[1] - goal[1]) + abs(node[2] - goal[2])
-    return (manhat)
+getManhattanDistance=function(node, goal) {
+
+  xDifference = abs(node[1] - goal[1]) 
+  yDifference = abs(node[2] - goal[2])
+  
+  if (xDifference == 0 && yDifference == 0) {
+    zero = 0
+    return (zero)
+  }
+  
+  if(xDifference == 0){
+    xDifference = yDifference
+  }
+  if (yDifference == 0){
+    yDifference = xDifference
+  }
+  manhat = xDifference + yDifference
+  return (manhat)
 }
 
-getHeuristicsAUX = function(node, goal, roads) {
-    #Get heuristic of a node
-    aux = getManhattanDistance(org, dest)
-    aux = aux * ((mean(roads[1]) + mean(roads[2])) / 2)
-    return (aux)
+getHeuristicsAUX = function(node, goal, roads){
+  #Ta fram heuristic f??r noden
+  aux = getManhattanDistance(node, dest)
+  roadsMean = mean(roads[1]) + mean(roads[2])
+  aux = aux * (roadsMean/2)
+  return (aux)
 }
 
-getHeuristics = function(neighbours, goal, roads) {
-    #Get the total heuristic
-    
-    neighbours.h = vector("numeric", length = length(neighbours))
-    
-    for (i in 1:length(neighbours)) {
-        neigh = getHeuristicsAUX(neighbours[i], dest, roads)
-        neighbours.h[i] <- neigh
-    }
-    
-    return (neighbours.h)
+getHeuristics = function(neighbours, goal, roads){
+  #Ta fram heuristic f??r noden
+  
+  neighbours.h = vector("numeric", length = length(neighbours))
+  for(i in 1:length(neighbours)) {
+    neigh = getHeuristicsAUX(neighbours[[i]], dest, roads)
+    neighbours.h[i] <- neigh
+  }
+  return (neighbours.h)
 }
+
 
 #
 #   Run tests
