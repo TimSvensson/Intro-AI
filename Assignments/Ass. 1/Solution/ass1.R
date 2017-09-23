@@ -174,10 +174,11 @@ getEdgeCost = function(neighbours, currentPos, roads) {
   hroads = roads$hroads
   vroads = roads$vroads
   
-  g = list()
+  
   print("Length neighbours:")
   print(length(neighbours))
   print(neighbours)
+  g = list()
   for (i in 1:length(neighbours)) {
     
     # Neighbour to the right
@@ -191,7 +192,7 @@ getEdgeCost = function(neighbours, currentPos, roads) {
       print(currentPos[1])
       print("currentPos[2]")
       print(currentPos[2])
-      g = c(g, hroads[currentPos[2], currentPos[1]+1])
+      g <- c(g, hroads[currentPos[2], currentPos[1]+1])
     }
     
     # Neighbour to the left
@@ -205,12 +206,12 @@ getEdgeCost = function(neighbours, currentPos, roads) {
       print(currentPos[1])
       print("currentPos[2]")
       print(currentPos[2])
-      g = c(g, hroads[currentPos[2], currentPos[1]-1])
+      g <- c(g, hroads[currentPos[2], currentPos[1]-1])
     }
     
     # Neighbour above
     
-    if (neighbours[[i]][1] > currentPos[2] & neighbours[[i]][2] == currentPos[1]) {
+    if (neighbours[[i]][2] > currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
       print("neighbours[[i]][1]")
       print(neighbours[[i]][1])
       print("neighbours[[i]][2]")
@@ -219,12 +220,12 @@ getEdgeCost = function(neighbours, currentPos, roads) {
       print(currentPos[1])
       print("currentPos[2]")
       print(currentPos[2])
-      g = c(g, vroads[currentPos[2]+1, currentPos[1]])
+      g <- c(g, vroads[currentPos[2]+1, currentPos[1]])
     }
     
     # Neighbour below
     
-    if (neighbours[[i]][1] < currentPos[2] & neighbours[[i]][2] == currentPos[1]) {
+    if (neighbours[[i]][2] < currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
       print("neighbours[[i]][1]")
       print(neighbours[[i]][1])
       print("neighbours[[i]][2]")
@@ -233,11 +234,12 @@ getEdgeCost = function(neighbours, currentPos, roads) {
       print(currentPos[1])
       print("currentPos[2]")
       print(currentPos[2])
-      g = c(g, vroads[currentPos[2]-1, currentPos[1]])
+      g <- c(g, vroads[currentPos[2]-1, currentPos[1]])
     }
   }
   
-  
+  print("Finished making g:")
+  print(g)
   return (g)
   
   # If x or y value > currentPos then move right or up
@@ -380,6 +382,8 @@ search = function(currentPos, destination, roads) {
     neighbours = getNeighbours(newCurrentPos, roads, destination)
     heuristics = getHeuristics(neighbours, destination, roads)
     edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
+    print("Edgecost:")
+    print(edgeCost)
     xList = list()
     yList = list()
     
