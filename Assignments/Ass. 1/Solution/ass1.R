@@ -197,7 +197,7 @@ getEdgeCost = function(neighbours, currentPos, roads) {
     
     # Neighbour to the left
     
-    if (neighbours[[i]][1] < currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
+    else if (neighbours[[i]][1] < currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
       print("neighbours[[i]][1]")
       print(neighbours[[i]][1])
       print("neighbours[[i]][2]")
@@ -211,7 +211,7 @@ getEdgeCost = function(neighbours, currentPos, roads) {
     
     # Neighbour above
     
-    if (neighbours[[i]][2] > currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
+    else if (neighbours[[i]][2] > currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
       print("neighbours[[i]][1]")
       print(neighbours[[i]][1])
       print("neighbours[[i]][2]")
@@ -225,7 +225,7 @@ getEdgeCost = function(neighbours, currentPos, roads) {
     
     # Neighbour below
     
-    if (neighbours[[i]][2] < currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
+    else if (neighbours[[i]][2] < currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
       print("neighbours[[i]][1]")
       print(neighbours[[i]][1])
       print("neighbours[[i]][2]")
