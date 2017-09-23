@@ -392,19 +392,11 @@ search = function(currentPos, destination, roads) {
         next
       }
       
-      visited <- rbind(visited, frontier[1,])
-      frontier = frontier[-c(1),]
-      frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
-      rownames(frontier) <- seq(length=nrow(frontier))
-      
-      
-      nrowVisited = nrow(visited)
-      
       print("edgeCost[i]")
       print(edgeCost[i])
       
       tempframe <- data.frame(
-        accCost = visited[nrowVisited,1] + (visited[nrowVisited,2] - visited[nrowVisited,3]),
+        accCost = frontier[1,1] + (frontier[1,2] - frontier[1,3]),
         fCost = edgeCost[[i]] + heuristics[i],
         destHeuristic = heuristics[i],
         xDestCoord = xList[[i]],
@@ -414,6 +406,12 @@ search = function(currentPos, destination, roads) {
       )
       frontier = rbind(frontier, tempframe)
     }
+    
+    frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
+    visited <- rbind(visited, frontier[1,])
+    frontier = frontier[-c(1),]
+    rownames(frontier) <- seq(length=nrow(frontier))  
+    nrowVisited = nrow(visited)
     
  
     newCurrentPos = c(visited[nrow(visited), 4], visited[nrow(visited), 5])
