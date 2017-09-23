@@ -9,7 +9,7 @@ myCar = function(roads, car, packages) {
     car$mem = car.destination.set(packages, car)
   }
   #########REMOVE WHEN DONE##################
-  search(c(5,5), c(7,8), roads)
+  search(c(5,5), c(8,4), roads)
   ########################################### 
   car.pos = car.position.get(car)
   dest.pos = car.destination.get(car)
@@ -205,8 +205,6 @@ getEdgeCost = function(neighbours, currentPos, roads) {
     }
   }
   
-  print("Finished making g:")
-  print(g)
   return (g)
   
   # If x or y value > currentPos then move right or up
@@ -339,7 +337,8 @@ search = function(currentPos, destination, roads) {
   print("Visited:")
   print(visited)
   #Loop from here
-  while((visited[nrow(visited), 4] != destination[1]) && (visited[nrow(visited), 5] != destination[2])){
+  
+  while((visited[nrow(visited), 4] != destination[1]) || (visited[nrow(visited), 5] != destination[2])){
     
     neighbours = getNeighbours(newCurrentPos, roads, destination)
     heuristics = getHeuristics(neighbours, destination, roads)
@@ -362,14 +361,6 @@ search = function(currentPos, destination, roads) {
     }
     
     row = NaN
-    
-    print("XList")
-    print(xList)
-    print("YList")
-    print(yList)
-    
-    print("Frontier")
-    print(frontier)
   
     for(i in 1:length(xList)){
       if(length(xList) < i) {
@@ -392,9 +383,6 @@ search = function(currentPos, destination, roads) {
         next
       }
       
-      print("edgeCost[i]")
-      print(edgeCost[i])
-      
       tempframe <- data.frame(
         accCost = frontier[1,1] + (frontier[1,2] - frontier[1,3]),
         fCost = edgeCost[[i]] + heuristics[i],
@@ -408,6 +396,7 @@ search = function(currentPos, destination, roads) {
     }
     
     frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
+    print("Added to visit")
     visited <- rbind(visited, frontier[1,])
     frontier = frontier[-c(1),]
     rownames(frontier) <- seq(length=nrow(frontier))  
@@ -424,10 +413,7 @@ search = function(currentPos, destination, roads) {
     xCoord = visited[rowsinVisited,4], 
     yCoord = visited[rowsinVisited,5]
   )
-  print("Concat")
-  print(wayBack[1,])
-  print("Destination")
-  print(destination)
+
   print("Wayback Original")
   print(wayBack)
   xOrigin = visited[rowsinVisited,6]
@@ -442,14 +428,15 @@ search = function(currentPos, destination, roads) {
       wayBack <- rbind(tempFrame, wayBack)
       xOrigin = visited[i, 6]
       yOrigin = visited[i, 7]
-      print("Wayback")
-      print(wayBack)
+      
       
       if(xOrigin == currentPos[1] && yOrigin == currentPos[2]){
         break
       }
     }
   }
+  print("Wayback")
+  print(wayBack)
   
   return (wayBack)
   
