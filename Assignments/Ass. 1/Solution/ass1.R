@@ -1,38 +1,38 @@
- myCar = function(roads, car, packages) {
-    # roads={matrix(hroads)|matrix(vroads)}
-    # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
-    # Package={source(x,y)|destination(x,y)|status(i)}
-    
-    # If there is no path in mem
-    if (length(car$mem) == 0) {
-        # calculate optimal path and store it in mem
-        car$mem = car.destination.set(packages, car)
-    }
-    #########REMOVE WHEN DONE##################
-    search(c(5,5), c(7,8), roads)
-    ########################################### 
-    car.pos = car.position.get(car)
+myCar = function(roads, car, packages) {
+  # roads={matrix(hroads)|matrix(vroads)}
+  # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
+  # Package={source(x,y)|destination(x,y)|status(i)}
+  
+  # If there is no path in mem
+  if (length(car$mem) == 0) {
+    # calculate optimal path and store it in mem
+    car$mem = car.destination.set(packages, car)
+  }
+  #########REMOVE WHEN DONE##################
+  search(c(5,5), c(7,8), roads)
+  ########################################### 
+  car.pos = car.position.get(car)
+  dest.pos = car.destination.get(car)
+  
+  # if a node stored in mem is reached, remove it
+  if ((car.pos[1] == dest.pos[1] & car.pos[2] == dest.pos[2])) {
+    car$mem = car.destination.set(packages, car)
     dest.pos = car.destination.get(car)
-    
-    # if a node stored in mem is reached, remove it
-    if ((car.pos[1] == dest.pos[1] & car.pos[2] == dest.pos[2])) {
-        car$mem = car.destination.set(packages, car)
-        dest.pos = car.destination.get(car)
-    }
-    
-    # find optimal path to next node in mem
-    car$nextMove = getNextMove(car.pos, dest.pos, roads)
-    
-    print("Packages:")
-    print(packages)
-    
-    print("Car:")
-    print(car)
-    
-    # print("Roads:")
-    # print(roads)
-    
-    return(car)
+  }
+  
+  # find optimal path to next node in mem
+  car$nextMove = getNextMove(car.pos, dest.pos, roads)
+  
+  print("Packages:")
+  print(packages)
+  
+  print("Car:")
+  print(car)
+  
+  # print("Roads:")
+  # print(roads)
+  
+  return(car)
 }
 
 #
@@ -46,24 +46,24 @@
 #   return  - A numeric vector containing the car's new destination.
 #
 car.destination.set = function(pkgs, car) {
-    car.pos = c(car$x, car$y)
-    
-    if (length(packages.get.held(pkgs)) > 0) {
-        return (package.get.dropOff.position(packages.get.held(pkgs)))
-    }
-    
-    pkgs = packages.get.pickUp(pkgs)
-    
-    pkgs.distance = vector("numeric", length = nrow(pkgs))
-    
-    for (i in 1:nrow(pkgs)) {
-        pkg.pos = c(pkgs[i, 1],
-                    pkgs[i, 2])
-        pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
-    }
-    
-    pkgs.min = which.min(pkgs.distance)
-    return(package.get.pickUp.position(pkgs[pkgs.min, ]))
+  car.pos = c(car$x, car$y)
+  
+  if (length(packages.get.held(pkgs)) > 0) {
+    return (package.get.dropOff.position(packages.get.held(pkgs)))
+  }
+  
+  pkgs = packages.get.pickUp(pkgs)
+  
+  pkgs.distance = vector("numeric", length = nrow(pkgs))
+  
+  for (i in 1:nrow(pkgs)) {
+    pkg.pos = c(pkgs[i, 1],
+                pkgs[i, 2])
+    pkgs.distance[i] = getManhattanDistance(car.pos, pkg.pos)
+  }
+  
+  pkgs.min = which.min(pkgs.distance)
+  return(package.get.pickUp.position(pkgs[pkgs.min, ]))
 }
 
 #   car.destination.get
@@ -72,7 +72,7 @@ car.destination.set = function(pkgs, car) {
 #   return  - A numeric vector containing the car's destination.
 #
 car.destination.get = function(car) {
-    return(c(car$mem[1], car$mem[2]))
+  return(c(car$mem[1], car$mem[2]))
 }
 
 #   car.position.get
@@ -81,7 +81,7 @@ car.destination.get = function(car) {
 #   return  - A numeric vector containing the car's position.
 #
 car.position.get = function(car) {
-    return (c(car$x, car$y))
+  return (c(car$x, car$y))
 }
 
 #
@@ -98,9 +98,9 @@ car.position.get = function(car) {
 #   Return  - All rows containing packages that have been delivered.
 #
 packages.get.delivered = function(packages) {
-    return(pkgs[pkgs[, 5] == 2,
-                ,
-                drop = FALSE])
+  return(pkgs[pkgs[, 5] == 2,
+              ,
+              drop = FALSE])
 }
 
 #   packages.get.held
@@ -109,9 +109,9 @@ packages.get.delivered = function(packages) {
 #   return  - All rows containing packages that are held in the car.
 #
 packages.get.held = function(pkgs) {
-    return(pkgs[pkgs[, 5] == 1,
-                ,
-                drop = FALSE])
+  return(pkgs[pkgs[, 5] == 1,
+              ,
+              drop = FALSE])
 }
 
 #   packages.get.pickUp
@@ -120,9 +120,9 @@ packages.get.held = function(pkgs) {
 #   return  - All rows containing packages that are to be picked up.
 #
 packages.get.pickUp = function(pkgs) {
-    return(pkgs[pkgs[, 5] == 0,
-                ,
-                drop = FALSE])
+  return(pkgs[pkgs[, 5] == 0,
+              ,
+              drop = FALSE])
 }
 
 #
@@ -138,8 +138,8 @@ packages.get.pickUp = function(pkgs) {
 #   pkg     - A numeric vector representing a package.
 #   return  - A numeric vector representing the pick up position.
 package.get.pickUp.position = function(pkg) {
-    return(c(pkg[1],
-             pkg[2]))
+  return(c(pkg[1],
+           pkg[2]))
 }
 
 #   package.get.dropOff.position
@@ -147,33 +147,33 @@ package.get.pickUp.position = function(pkg) {
 #   pkg     - A numeric vector representing a package.
 #   return  - A numeric vector representing the drop off position.
 package.get.dropOff.position = function(pkg) {
-    return(c(pkg[3],
-             pkg[4]))
+  return(c(pkg[3],
+           pkg[4]))
 }
 
 
 getNextMove = function(carPos, destPos, roads) {
-    direction = list(
-        down = 2,
-        left = 4,
-        right = 6,
-        up = 8,
-        stay = 5
-    )
-    
-    if (carPos[1] < destPos[1]) {
-        nextMove = direction$right
-    } else if (carPos[1] > destPos[1]) {
-        nextMove =  direction$left
-    } else if (carPos[2] < destPos[2]) {
-        nextMove = direction$up
-    } else if (carPos[2] > destPos[2]) {
-        nextMove = direction$down
-    } else {
-        nextMove = direction$stay
-    }
-    
-    return(nextMove)
+  direction = list(
+    down = 2,
+    left = 4,
+    right = 6,
+    up = 8,
+    stay = 5
+  )
+  
+  if (carPos[1] < destPos[1]) {
+    nextMove = direction$right
+  } else if (carPos[1] > destPos[1]) {
+    nextMove =  direction$left
+  } else if (carPos[2] < destPos[2]) {
+    nextMove = direction$up
+  } else if (carPos[2] > destPos[2]) {
+    nextMove = direction$down
+  } else {
+    nextMove = direction$stay
+  }
+  
+  return(nextMove)
 }
 
 getEdgeCost = function(neighbours, currentPos, roads) {
@@ -183,33 +183,23 @@ getEdgeCost = function(neighbours, currentPos, roads) {
   g = list()
   for (i in neighbours) {
     
-    print("i is:")
-    print(i)
     # Neighbour to the right
     if (i[1] > currentPos[1] & i[2] == currentPos[2]) {
-      print("Neighbour to right")
       g = c(g, hroads[currentPos[2], currentPos[1]+1])
-      print("g:")
-      print(g)
-      
+
     }
     
     # Neighbour to the left
     if (i[1] < currentPos[1] & i[2] == currentPos[2]) {
-      print("Neighbour to left")
       cat(sprintf("hroads[1] and [2]: %d\n", (hroads[currentPos[1], currentPos[2]]) ))
       g = c(g, hroads[currentPos[2], currentPos[1]-1])
-      print("g:")
-      print(g)
-      
+
     }
     
     # Neighbour above
     if (i[2] > currentPos[2] & i[1] == currentPos[1]) {
-      print("Neighbour above")
       g = c(g, vroads[currentPos[2]+1, currentPos[1]])
-      print("g:")
-      print(g)
+     
       
     }
     
@@ -217,8 +207,7 @@ getEdgeCost = function(neighbours, currentPos, roads) {
     if (i[2] < currentPos[2] & i[1] == currentPos[1]) {
       print("Neighbour below")
       g = c(g, vroads[currentPos[2]-1, currentPos[1]])
-      print("g:")
-      print(g)
+  
     }
   }
   
@@ -290,7 +279,7 @@ getNeighbours = function(currPos, roads, destination) {
   
   
   #for(i in 1:length(neighbours)) {
-   # print("edgeCost[i]")
+  # print("edgeCost[i]")
   #  print(edgeCost[[i]])
   #  neighboursFrame <- data.frame(
   #    actualCost = edgeCost[i], 
@@ -306,7 +295,7 @@ getNeighbours = function(currPos, roads, destination) {
 }
 
 getManhattanDistance=function(node, goal) {
-
+  
   xDifference = abs(node[1] - goal[1]) 
   yDifference = abs(node[2] - goal[2])
   
@@ -330,8 +319,7 @@ getHeuristics = function(neighbours, goal, roads){
     neigh = getHeuristicsAUX(neighbours[[i]], goal, roads)
     neighbours.h[i] <- neigh
   }
-  print("neighbours.h")
-  print(neighbours.h)
+
   return (neighbours.h)
 }
 
@@ -359,94 +347,118 @@ search = function(currentPos, destination, roads) {
     yOriginCoord = 999
     
   )
- # visited <- visited[-c(1),]
+  # visited <- visited[-c(1),]
   
   newCurrentPos = currentPos
-  print("Length")
-  print(nrow(visited))
-  print(visited)
   
   #Loop from here
-  while(visited[nrow(visited), 4] != destination[1] && visited[nrow(visited), 5] != destination[2]){
-  
-  neighbours = getNeighbours(newCurrentPos, roads, destination)
-  print("timaintshit")
-  heuristics = getHeuristics(neighbours, destination, roads)
-  edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
-  
-  
-  xList = list()
-  yList = list()
-
-  for(i in neighbours) {
-    xList = c(xList, i[1])
-  }
-  
-  for(i in neighbours) {
-    yList = c(yList, i[2])
-  }
-  
-  #Kolla om någon av neighbours redan finns i frontier . 
-  #Om de finns, lägg endast till om de är billigare att ta sig till.
-  #Ta även bort det dyrare alternativet från frontier.
-  
-  row = NaN
-  
-  for(i in 1:length(neighbours)){
-    foundACopy = FALSE
-    for(j in nrow(frontier)) {
-      print("andra for loop")
-      print(frontier[j,4] == xList[[i]])
-      print(frontier[j,5] == yList[[i]])
-      
-      
-      if(frontier[j,4] == xList[[i]] && frontier[j,5] == yList[[i]]){
-        print("herehereherehereherehereherehereherehereherehereherehere")
-        if((frontier[j, 1] + frontier[j, 2]) > (xList[[i]] + yList[[i]])) {
-          frontier <- frontier[-c(j),]
-        } else if ((frontier[j, 1] + frontier[j, 2]) <= (xList[[i]] + yList[[i]])) {
-          print("neighbourtest")
-          print (neighbours)
-          neighbours[i] <- NULL 
-          print("##############################################")
-          print(neighbours)
-          foundACopy = TRUE
-        } 
-      }
-    }
-    if(foundACopy) {
-      next
+  while((visited[nrow(visited), 4] != destination[1]) && (visited[nrow(visited), 5] != destination[2])){
+    
+    neighbours = getNeighbours(newCurrentPos, roads, destination)
+    heuristics = getHeuristics(neighbours, destination, roads)
+    edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
+    
+    
+    xList = list()
+    yList = list()
+    
+    for(i in neighbours) {
+      xList = c(xList, i[1])
     }
     
-    tempframe <- data.frame(
-      accCost = frontier[1,1] + (frontier[1,2] - frontier[1,3]),
-      fCost = edgeCost[[i]] + heuristics[i],
-      destHeuristic = heuristics[i],
-      xDestCoord = xList[[i]],
-      yDestCoord = yList[[i]],
-      xOriginCoord = newCurrentPos[1],
-      yOriginCoord = newCurrentPos[2]
-    )
-    frontier = rbind(frontier, tempframe)
-  }
-  
-  
-  
-  visited <- rbind(visited, frontier[1,])
-  
-  frontier = frontier[-c(1),]
-  frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
-  rownames(frontier) <- seq(length=nrow(frontier))
+    for(i in neighbours) {
+      yList = c(yList, i[2])
+    }
+    
+    #Kolla om någon av neighbours redan finns i frontier . 
+    #Om de finns, lägg endast till om de är billigare att ta sig till.
+    #Ta även bort det dyrare alternativet från frontier.
+    
+    row = NaN
+    
+    for(i in 1:length(xList)){
+      if(length(xList) < i) {
+        break
+      }
+      foundACopy = FALSE
+      for(j in 1:nrow(frontier)) {
+        if(nrow(frontier) < j){
+          break
+        }
+        if(frontier[j,4] == xList[[i]] && frontier[j,5] == yList[[i]]){
+          if((frontier[j, 1] + frontier[j, 2]) > (xList[[i]] + yList[[i]])) {
+            frontier <- frontier[-c(j),]
+          } else if ((frontier[j, 1] + frontier[j, 2]) <= (xList[[i]] + yList[[i]])) {
+            foundACopy = TRUE
+          } 
+        }
+      }
+      if(foundACopy) {
+        next
+      }
+      
+      visited <- rbind(visited, frontier[1,])
+      print("Frontier unsorted")
+      print(frontier)
+      frontier = frontier[-c(1),]
+      frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
+      rownames(frontier) <- seq(length=nrow(frontier))
+      print("Frontier sorted")
+      print(frontier)
+      
+      nrowVisited = nrow(visited)
+      
+      tempframe <- data.frame(
+        accCost = visited[nrowVisited,1] + (visited[nrowVisited,2] - visited[nrowVisited,3]),
+        fCost = edgeCost[[i]] + heuristics[i],
+        destHeuristic = heuristics[i],
+        xDestCoord = xList[[i]],
+        yDestCoord = yList[[i]],
+        xOriginCoord = newCurrentPos[1],
+        yOriginCoord = newCurrentPos[2]
+      )
+      frontier = rbind(frontier, tempframe)
+    }
+    
  
-  print("frontier:")
-  print(frontier)
-  
-  print("visited")
+    newCurrentPos = c(visited[nrow(visited), 4], visited[nrow(visited), 5])
+  }
+  print("Visited")
   print(visited)
   
-  newCurrentPos = c(visited[nrow(visited), 4], visited[nrow(visited), 5])
+  rowsinVisited = nrow(visited) 
+  wayBack <- data.frame(
+    xCoord = visited[rowsinVisited,4], 
+    yCoord = visited[rowsinVisited,5]
+  )
+  print("Concat")
+  print(wayBack[1,])
+  print("Destination")
+  print(destination)
+  print("Wayback Original")
+  print(wayBack)
+  xOrigin = visited[rowsinVisited,6]
+  yOrigin = visited[rowsinVisited,7]
+  
+  for(i in 1:rowsinVisited){
+    if(visited[i, 4] == xOrigin && visited[i, 5] == yOrigin){
+      tempFrame <- data.frame(
+        xCoord = visited[i, 4],
+        yCoord = visited[i, 5]
+      )
+      wayBack <- rbind(tempFrame, wayBack)
+      xOrigin = visited[i, 6]
+      yOrigin = visited[i, 7]
+      print("Wayback")
+      print(wayBack)
+      
+      if(xOrigin == currentPos[1] && yOrigin == currentPos[2]){
+        break
+      }
+    }
   }
   
+  return (wayBack)
   
 }
 
