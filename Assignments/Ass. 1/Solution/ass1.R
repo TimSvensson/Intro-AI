@@ -181,54 +181,58 @@ getEdgeCost = function(neighbours, currentPos, roads) {
   for (i in 1:length(neighbours)) {
     
     # Neighbour to the right
-    print("i[1]")
-    print(i[1])
-    print("i[2]")
-    print(i[2])
-    print("currentPos[1]")
-    print(currentPos[1])
-    print("currentPos[2]")
-    print(currentPos[2])
-    if (i[1] > currentPos[1] & i[2] == currentPos[2]) {
+    
+    if (neighbours[[i]][1] > currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
+      print("neighbours[[i]][1]")
+      print(neighbours[[i]][1])
+      print("neighbours[[i]][2]")
+      print(neighbours[[i]][2])
+      print("currentPos[1]")
+      print(currentPos[1])
+      print("currentPos[2]")
+      print(currentPos[2])
       g = c(g, hroads[currentPos[2], currentPos[1]+1])
     }
     
     # Neighbour to the left
-    print("i[1]")
-    print(i[1])
-    print("i[2]")
-    print(i[2])
-    print("currentPos[1]")
-    print(currentPos[1])
-    print("currentPos[2]")
-    print(currentPos[2])
-    if (i[1] < currentPos[1] & i[2] == currentPos[2]) {
+    
+    if (neighbours[[i]][1] < currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
+      print("neighbours[[i]][1]")
+      print(neighbours[[i]][1])
+      print("neighbours[[i]][2]")
+      print(neighbours[[i]][2])
+      print("currentPos[1]")
+      print(currentPos[1])
+      print("currentPos[2]")
+      print(currentPos[2])
       g = c(g, hroads[currentPos[2], currentPos[1]-1])
     }
     
     # Neighbour above
-    print("i[1]")
-    print(i[1])
-    print("i[2]")
-    print(i[2])
-    print("currentPos[1]")
-    print(currentPos[1])
-    print("currentPos[2]")
-    print(currentPos[2])
-    if (i[2] > currentPos[2] & i[1] == currentPos[1]) {
+    
+    if (neighbours[[i]][1] > currentPos[2] & neighbours[[i]][2] == currentPos[1]) {
+      print("neighbours[[i]][1]")
+      print(neighbours[[i]][1])
+      print("neighbours[[i]][2]")
+      print(neighbours[[i]][2])
+      print("currentPos[1]")
+      print(currentPos[1])
+      print("currentPos[2]")
+      print(currentPos[2])
       g = c(g, vroads[currentPos[2]+1, currentPos[1]])
     }
     
     # Neighbour below
-    print("i[1]")
-    print(i[1])
-    print("i[2]")
-    print(i[2])
-    print("currentPos[1]")
-    print(currentPos[1])
-    print("currentPos[2]")
-    print(currentPos[2])
-    if (i[2] < currentPos[2] & i[1] == currentPos[1]) {
+    
+    if (neighbours[[i]][1] < currentPos[2] & neighbours[[i]][2] == currentPos[1]) {
+      print("neighbours[[i]][1]")
+      print(neighbours[[i]][1])
+      print("neighbours[[i]][2]")
+      print(neighbours[[i]][2])
+      print("currentPos[1]")
+      print(currentPos[1])
+      print("currentPos[2]")
+      print(currentPos[2])
       g = c(g, vroads[currentPos[2]-1, currentPos[1]])
     }
   }
