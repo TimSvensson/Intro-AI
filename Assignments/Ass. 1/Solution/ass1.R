@@ -1,4 +1,4 @@
-myCar = function(roads, car, packages) {
+ myCar = function(roads, car, packages) {
     # roads={matrix(hroads)|matrix(vroads)}
     # car=list(position(x,y),wait=0,load=0,nextMove=NA,mem=list())
     # Package={source(x,y)|destination(x,y)|status(i)}
@@ -337,10 +337,43 @@ getHeuristics = function(neighbours, goal, roads){
 
 search = function(currentPos, destination, roads) {
   
+  
+  currPosHeur = getHeuristics(list(currentPos), destination, roads)
+  frontier <- data.frame(
+    accCost = 0,
+    fCost = currPosHeur,
+    destHeuristic = currPosHeur,
+    xDestCoord = currentPos[1],
+    yDestCoord = currentPos[2],
+    xOriginCoord = currentPos[1],
+    yOriginCoord = currentPos[2]
+  )
+  
+  visited <- data.frame(
+    accCost = 999,
+    fCost = 999,
+    destHeuristic = 999,
+    xDestCoord = 999,
+    yDestCoord = 999,
+    xOriginCoord = 999,
+    yOriginCoord = 999
+    
+  )
+ # visited <- visited[-c(1),]
+  
+  newCurrentPos = currentPos
+  print("Length")
+  print(nrow(visited))
+  print(visited)
+  
   #Loop from here
-  neighbours = getNeighbours(currentPos, roads, destination)
+  while(visited[nrow(visited), 4] != destination[1] && visited[nrow(visited), 5] != destination[2]){
+  
+  neighbours = getNeighbours(newCurrentPos, roads, destination)
   print("timaintshit")
   heuristics = getHeuristics(neighbours, destination, roads)
+  edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
+  
   
   xList = list()
   yList = list()
@@ -352,38 +385,68 @@ search = function(currentPos, destination, roads) {
   for(i in neighbours) {
     yList = c(yList, i[2])
   }
-  print("neighbours")
-  print(neighbours)
   
-  print("xList")
-  print(xList)
+  #Kolla om någon av neighbours redan finns i frontier . 
+  #Om de finns, lägg endast till om de är billigare att ta sig till.
+  #Ta även bort det dyrare alternativet från frontier.
   
-  print("yList")
-  print(yList)
-  
-  dataFrame <- data.frame(
-    xDestCoord = NaN,
-    yDestCoord = NaN,
-    xOriginCoord = NaN,
-    yOriginCoord = NaN,
-    destHeuristic = NaN
-  )
-  
+  row = NaN
   
   for(i in 1:length(neighbours)){
+    foundACopy = FALSE
+    for(j in nrow(frontier)) {
+      print("andra for loop")
+      print(frontier[j,4] == xList[[i]])
+      print(frontier[j,5] == yList[[i]])
+      
+      
+      if(frontier[j,4] == xList[[i]] && frontier[j,5] == yList[[i]]){
+        print("herehereherehereherehereherehereherehereherehereherehere")
+        if((frontier[j, 1] + frontier[j, 2]) > (xList[[i]] + yList[[i]])) {
+          frontier <- frontier[-c(j),]
+        } else if ((frontier[j, 1] + frontier[j, 2]) <= (xList[[i]] + yList[[i]])) {
+          print("neighbourtest")
+          print (neighbours)
+          neighbours[i] <- NULL 
+          print("##############################################")
+          print(neighbours)
+          foundACopy = TRUE
+        } 
+      }
+    }
+    if(foundACopy) {
+      next
+    }
+    
     tempframe <- data.frame(
+      accCost = frontier[1,1] + (frontier[1,2] - frontier[1,3]),
+      fCost = edgeCost[[i]] + heuristics[i],
+      destHeuristic = heuristics[i],
       xDestCoord = xList[[i]],
       yDestCoord = yList[[i]],
-      xOriginCoord = currentPos[1],
-      yOriginCoord = currentPos[2],
-      destHeuristic = heuristics[i]
+      xOriginCoord = newCurrentPos[1],
+      yOriginCoord = newCurrentPos[2]
     )
-    dataFrame = rbind(dataFrame, tempframe)
+    frontier = rbind(frontier, tempframe)
   }
   
-  dataFrame = dataFrame[-c(1),]
-  rownames(dataFrame) <- seq(length=nrow(dataFrame))
-  print(dataFrame)
+  
+  
+  visited <- rbind(visited, frontier[1,])
+  
+  frontier = frontier[-c(1),]
+  frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
+  rownames(frontier) <- seq(length=nrow(frontier))
+ 
+  print("frontier:")
+  print(frontier)
+  
+  print("visited")
+  print(visited)
+  
+  newCurrentPos = c(visited[nrow(visited), 4], visited[nrow(visited), 5])
+  }
+  
   
 }
 
