@@ -334,7 +334,7 @@ getHeuristics = function(neighbours, goal, roads){
   return (neighbours.h)
 }
 
-setFrontier = function(currPosHeur) {
+setFrontier = function(currentPos, currPosHeur) {
   frontier <- data.frame(
     accCost = 0,
     fCost = currPosHeur,
@@ -367,7 +367,7 @@ search = function(currentPos, destination, roads) {
   
   
   currPosHeur = getHeuristics(list(currentPos), destination, roads)
-  frontier = setFrontier(currPosHeur)
+  frontier = setFrontier(currentPos, currPosHeur)
   visited = setVisited()
   # visited <- visited[-c(1),]
   
@@ -388,14 +388,22 @@ search = function(currentPos, destination, roads) {
     yList = list()
     
     for(i in neighbours) {
-      xList = c(xList, i[1])
+      xList = c(xList, i)
     }
     
     for(i in neighbours) {
-      yList = c(yList, i[2])
+      yList = c(yList, i)
     }
     
     row = NaN
+    
+    print("XList")
+    print(xList)
+    print("YList")
+    print(yList)
+    
+    print("Frontier")
+    print(frontier)
   
     for(i in 1:length(xList)){
       if(length(xList) < i) {
