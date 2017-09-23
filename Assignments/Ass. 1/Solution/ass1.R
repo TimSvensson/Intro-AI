@@ -174,66 +174,33 @@ getEdgeCost = function(neighbours, currentPos, roads) {
   hroads = roads$hroads
   vroads = roads$vroads
   
-  
-  print("Length neighbours:")
-  print(length(neighbours))
-  print(neighbours)
   g = list()
   for (i in 1:length(neighbours)) {
     
     # Neighbour to the right
     
     if (neighbours[[i]][1] > currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
-      print("neighbours[[i]][1]")
-      print(neighbours[[i]][1])
-      print("neighbours[[i]][2]")
-      print(neighbours[[i]][2])
-      print("currentPos[1]")
-      print(currentPos[1])
-      print("currentPos[2]")
-      print(currentPos[2])
+      
       g <- c(g, hroads[currentPos[2], currentPos[1]+1])
     }
     
     # Neighbour to the left
     
     else if (neighbours[[i]][1] < currentPos[1] & neighbours[[i]][2] == currentPos[2]) {
-      print("neighbours[[i]][1]")
-      print(neighbours[[i]][1])
-      print("neighbours[[i]][2]")
-      print(neighbours[[i]][2])
-      print("currentPos[1]")
-      print(currentPos[1])
-      print("currentPos[2]")
-      print(currentPos[2])
+      
       g <- c(g, hroads[currentPos[2], currentPos[1]-1])
     }
     
     # Neighbour above
     
     else if (neighbours[[i]][2] > currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
-      print("neighbours[[i]][1]")
-      print(neighbours[[i]][1])
-      print("neighbours[[i]][2]")
-      print(neighbours[[i]][2])
-      print("currentPos[1]")
-      print(currentPos[1])
-      print("currentPos[2]")
-      print(currentPos[2])
+      
       g <- c(g, vroads[currentPos[2]+1, currentPos[1]])
     }
     
     # Neighbour below
     
     else if (neighbours[[i]][2] < currentPos[2] & neighbours[[i]][1] == currentPos[1]) {
-      print("neighbours[[i]][1]")
-      print(neighbours[[i]][1])
-      print("neighbours[[i]][2]")
-      print(neighbours[[i]][2])
-      print("currentPos[1]")
-      print(currentPos[1])
-      print("currentPos[2]")
-      print(currentPos[2])
       g <- c(g, vroads[currentPos[2]-1, currentPos[1]])
     }
   }
@@ -297,12 +264,7 @@ getNeighbours = function(currPos, roads, destination) {
     )  
   }
   
-  
-  
-  
-  neighboursHeuristics = getHeuristics(neighbours, destination, roads)
-  edgeCost = getEdgeCost(neighbours, currPos, roads)
-  currPosHeuristic = getHeuristicsAUX(currPos, destination, roads)
+  return(neighbours)
 }
 
 getManhattanDistance=function(node, goal) {
@@ -381,18 +343,22 @@ search = function(currentPos, destination, roads) {
     
     neighbours = getNeighbours(newCurrentPos, roads, destination)
     heuristics = getHeuristics(neighbours, destination, roads)
+    print("Length neighbours:")
+    print(length(neighbours))
     edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
+    print("Length neighbours AFTER:")
+    print(length(neighbours))
     print("Edgecost:")
     print(edgeCost)
     xList = list()
     yList = list()
     
     for(i in neighbours) {
-      xList = c(xList, i)
+      xList = c(xList, i[1])
     }
     
     for(i in neighbours) {
-      yList = c(yList, i)
+      yList = c(yList, i[2])
     }
     
     row = NaN
@@ -427,14 +393,15 @@ search = function(currentPos, destination, roads) {
       }
       
       visited <- rbind(visited, frontier[1,])
-      print("Frontier unsorted")
-      print(frontier)
       frontier = frontier[-c(1),]
       frontier <- frontier[ order(frontier$fCost + frontier$accCost), ]
       rownames(frontier) <- seq(length=nrow(frontier))
       
       
       nrowVisited = nrow(visited)
+      
+      print("edgeCost[i]")
+      print(edgeCost[i])
       
       tempframe <- data.frame(
         accCost = visited[nrowVisited,1] + (visited[nrowVisited,2] - visited[nrowVisited,3]),
