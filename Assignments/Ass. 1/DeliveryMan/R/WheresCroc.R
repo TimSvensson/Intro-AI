@@ -101,9 +101,9 @@ runWheresCroc=function(makeMoves,showCroc=T,pause=1) {
     Sys.sleep(pause)
     
     readings=getReadings(positions[1],probs)
-    #Loopa igenom alla punkter, för varje gör dnorm, och om det är större än tidigare värdet, lagra, i slutet printa
-    # högsta värdet och vilken punkt det var
-    getNormalizedReadings(readings, probs)
+    #Loopa igenom alla punkter, f??r varje g??r dnorm, och om det ??r st??rre ??n tidigare v??rdet, lagra, i slutet printa
+    # h??gsta v??rdet och vilken punkt det var
+    #getNormalizedReadings(readings, probs)
     
     print("READINGS:")
     print(readings)
@@ -130,40 +130,7 @@ runWheresCroc=function(makeMoves,showCroc=T,pause=1) {
   }
 }
 
-getNormalizedReadings = function(readings, probs) {
-  # Readings kommer vara tre värden
-  # För alla rader i probs, jämför och lagra värdet samt koordinater
-  largestPointSalinity = 0
-  largestPointPhosphate = 0
-  largestPointNitrogen = 0
-  largestCombined = 0
-  largestPointCombined = 0
-  probabilityContainer = vector("numeric", length=40)
-  
-  for(i in 1:nrow(probs$salinity)) {
-    
-    salinityLatest = dnorm(readings[[1]], probs$salinity[i,1], probs$salinity[i,2])
-    phosphateLatest = dnorm(readings[[2]], probs$phosphate[i,1], probs$phosphate[i,2])
-    nitrogenLatest = dnorm(readings[[3]], probs$nitrogen[i,1], probs$nitrogen[i,2])
-    
-    combinedLatest = salinityLatest*phosphateLatest*nitrogenLatest
-    probabilityContainer[i] = combinedLatest
-    
-    if (combinedLatest > largestCombined) {
-      largestCombined = combinedLatest
-      largestPointCombined = i
-    }
-  }
-  
-  # Take the list of non-normalized probabilities, normalize each value individually and put these in a new list
-  probabilityContainerNormalized = vector("numeric", length = 40)
-  for(i in 1:length(probabilityContainer)) {
-    nextValue = probabilityContainer[i] / Reduce("+", probabilityContainer)
-    probabilityContainerNormalized[i] = nextValue
-  }
-  
-  return (probabilityContainerNormalized)
-}
+
 
 #' @export
 getPoints=function() {
@@ -295,7 +262,7 @@ getProbs=function(){
   list(salinity=salinity,phosphate=phosphate,nitrogen=nitrogen)
 }
 
-#Man får medelvärde och standardavvikelse
+#Man f??r medelv??rde och standardavvikelse
 #' @export
 getReadings=function(point,probs){
   c(
