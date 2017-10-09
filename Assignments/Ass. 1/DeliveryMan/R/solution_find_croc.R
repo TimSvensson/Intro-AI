@@ -1,38 +1,81 @@
 NUMBER_OF_WATERHOLES = 40
 
 # 
-# 
-# 
-# 
-TRANSITIONS = matrix( 0, NUMBER_OF_WATERHOLES, NUMBER_OF_WATERHOLES )
+# transitions[ node.to, node.from ]
+#
 
 Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
 {
     # moveInfo  = List      { $moves, $mem }
     # readings  = Vector    { salinity, phosphate, nitrogen }
-    # positions = Vector    { Tourist1, Tourist2, Croc Hunter }
+    # positions = Vector    { Tourist1, Tourist2, Steve Irwin }
     # edges     = Matrix
-    # probes    = List
+    # probs     = List      { $slainity, $phsosphate, $nitrogen }
     
-    TRANSITIONS.make(edges)
+    
+    transitions = transitions.make( edges )
+    
+    #
+    # prev_belife = Vector { P( croc at node 1 ), P( croc at node 2 ), ... }
+    #
+    if ( length(moveInfo$mem) == 0 )
+    {
+        prev_belife = matrix( 1, 1, NUMBER_OF_WATERHOLES )
+    }
+    else
+    {
+        prev_belife = moveInfo$mem
+    }
+    observations = getNormalizedReadings( readings, probs )
+    
+    #print("prev_belife")
+    #print(prev_belife)
+    
+    #print("observations")
+    #print(observations)
+    
+    diagonal = makeDiagonalMatrix( observations )
+    #print("diagonal")
+    #print(diagonal)
+    
+    crnt_belife = prev_belife %*% diagonal %*% transitions
+    
+    #print("crnt_belife")
+    #print(crnt_belife)
+    
+    print("Most probable waterhole")
+    print(which.max(crnt_belife))
+    
+    moveInfo$mem = crnt_belife
+    moveInfo$moves=c(sample(getOptions(positions[3],edges),1),0)
+    
+    return( moveInfo )
 }
 
-
-TRANSITIONS.make = function(edges)
+makeDiagonalMatrix = function( vector )
 {
-    for ( y in 1:NUMBER_OF_WATERHOLES )
+    matrix = matrix(0, length(vector), length(vector))
+    for (i in 1:length(vector))
     {
-        print(y)
-        possible_transitions = getOptions(y, edges)
-        print(possible_transitions)
-        
-        for ( x in possible_transitions )
+        matrix[i,i] = vector[i]
+    }
+    return( matrix )
+}
+
+transitions.make = function( edges )
+{
+    m = matrix(0, NUMBER_OF_WATERHOLES, NUMBER_OF_WATERHOLES)
+    
+    for ( from in 1:NUMBER_OF_WATERHOLES )
+    {
+        possible_transitions = getOptions( from, edges )
+        for ( to in possible_transitions )
         {
-            TRANSITIONS[x,y] = 1 / length(possible_transitions)
+            m[ to, from ] = 1 / length(possible_transitions)
         }
     }
-    print( TRANSITIONS )
-    return( TRANSITIONS )
+    
+    return(m)
 }
 
 getNormalizedReadings = function(readings, probs) {
