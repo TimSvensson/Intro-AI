@@ -1,5 +1,10 @@
 #' @export
 randomWC=function(moveInfo,readings,positions,edges,probs) {
+  print("First value in salinity:")
+  print(probs$salinity[1,1])
+  print("Values in readings:")
+  print(readings)
+
   moveInfo$moves=c(sample(getOptions(positions[3],edges),1),0)  
   return(moveInfo)
 }
@@ -9,6 +14,7 @@ manualWC=function(moveInfo,readings,positions,edges,probs) {
   options=getOptions(positions[3],edges)
   print("Move 1 options (plus 0 for search):")
   print(options)
+  
   mv1=readline("Move 1: ")
   if (mv1=="q") {stop()}
   if (!mv1 %in% options && mv1 != 0) {
@@ -69,7 +75,7 @@ manualWC=function(moveInfo,readings,positions,edges,probs) {
 #' @param pause The pause period between moves. Ignore this.
 #' @return A string describing the outcome of the game.
 #' @export
-runWheresCroc=function(makeMoves,showCroc=F,pause=1) {
+runWheresCroc=function(makeMoves,showCroc=T,pause=1) {
   positions=sample(1:40,4) # Croc, BP1, BP2, Player
   points=getPoints()
   edges=getEdges()
@@ -100,6 +106,14 @@ runWheresCroc=function(makeMoves,showCroc=F,pause=1) {
     Sys.sleep(pause)
     
     readings=getReadings(positions[1],probs)
+    #Loopa igenom alla punkter, för varje gör dnorm, och om det är större än tidigare värdet, lagra, i slutet printa
+    # högsta värdet och vilken punkt det var
+    getMostProbableLocation(readings, probs)
+    
+    print("READINGS:")
+    print(readings)
+    print("DNORM:")
+    print(dnorm(readings[[1]], probs$salinity[1,1], probs$salinity[1,2]))
     moveInfo=makeMoves(moveInfo,readings,positions[2:4],edges,probs)
     if (length(moveInfo$moves)!=2) {
       stop("Error! Passed makeMoves function should return a vector of two elements.")
@@ -120,6 +134,45 @@ runWheresCroc=function(makeMoves,showCroc=F,pause=1) {
     }
   }
 }
+
+getNormalizedReadings = function(readings, probs) {
+  # Readings kommer vara tre värden
+  # För alla rader i probs, jämför och lagra värdet samt koordinater
+  largestPointSalinity = 0
+  largestPointPhosphate = 0
+  largestPointNitrogen = 0
+  largestSalinity = 0
+  largestPhosphate = 0
+  largestNitrogen = 0
+  
+  for(i in 1:nrow(probs$salinity)) {
+    salinityLatest = dnorm(readings[[1]], probs$salinity[i,1], probs$salinity[i,2])
+    phosphateLatest = dnorm(readings[[2]], probs$phosphate[i,1], probs$phosphate[i,2])
+    nitrogenLatest = dnorm(readings[[3]], probs$nitrogen[i,1], probs$nitrogen[i,2])
+    
+    if (salinityLatest > largestSalinity ) {
+      largestSalinity = salinityLatest
+      largestPointSalinity = i
+    }
+    if (phosphateLatest > largestPhosphate) {
+      largestPhosphate = phosphateLatest
+      largestPointPhosphate = i
+    }
+    if (nitrogenLatest > largestNitrogen ) {
+      largestNitrogen = nitrogenLatest
+      largestPointNitrogen = i
+    }
+  }
+  print("Finished looping, the largets values of salinity, phosphate and nitrogen are:")
+  print(largestSalinity)
+  print(largestPhosphate)
+  print(largestNitrogen)
+  print("Points of largest values:")
+  print(largestPointSalinity)
+  print(largestPointPhosphate)
+  print(largestPointNitrogen)
+}
+
 #' @export
 getPoints=function() {
   points=matrix(c(1,1),ncol=2)
@@ -250,6 +303,7 @@ getProbs=function(){
   list(salinity=salinity,phosphate=phosphate,nitrogen=nitrogen)
 }
 
+#Man får medelvärde och standardavvikelse
 #' @export
 getReadings=function(point,probs){
   c(
@@ -287,3 +341,5 @@ plotGameboard=function(points,edges,move,positions,showCroc) {
 getOptions=function(point,edges) {
   c(edges[which(edges[,1]==point),2],edges[which(edges[,2]==point),1],point)
 }
+
+runWheresCroc(randomWC)
