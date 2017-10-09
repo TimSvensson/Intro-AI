@@ -9,7 +9,11 @@ myCar = function(roads, car, packages) {
     car$mem = car.destination.set(packages, car)
   }
   #########REMOVE WHEN DONE##################
+
   #search(c(5,5), c(7,8), roads)
+
+  
+
   ########################################### 
   car.pos = car.position.get(car)
   print("CAR POS:")
@@ -158,6 +162,7 @@ getNextMove = function(carPos, destinationPos, roads) {
   )
   #print("###################################################33")
   #print(destinationPos)
+
   wayBack = search(carPos, destinationPos, roads)
   
   
@@ -171,6 +176,7 @@ getNextMove = function(carPos, destinationPos, roads) {
   #print("carPos:")
   #print(carPos[1]+1)
   #print(carPos[2]+1)
+
   
   if (carPos[1] < destPos[1]) {
     nextMove = direction$right
@@ -365,8 +371,7 @@ search = function(currentPos, destination, roads) {
     neighbours = getNeighbours(newCurrentPos, roads, destination)
     heuristics = getHeuristics(neighbours, destination, roads)
     edgeCost = getEdgeCost(neighbours, newCurrentPos, roads)
-    print("Edgecost:")
-    print(edgeCost)
+
     xList = list()
     yList = list()
     
@@ -422,9 +427,7 @@ search = function(currentPos, destination, roads) {
     newCurrentPos = c(visited[nrow(visited), 4], visited[nrow(visited), 5])
     print(visited)
   }
-  
-  
-  
+
   
   rowsinVisited = nrow(visited) 
   wayBack <- data.frame(
