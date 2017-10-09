@@ -1,10 +1,5 @@
 #' @export
 randomWC=function(moveInfo,readings,positions,edges,probs) {
-  print("First value in salinity:")
-  print(probs$salinity[1,1])
-  print("Values in readings:")
-  print(readings)
-
   moveInfo$moves=c(sample(getOptions(positions[3],edges),1),0)  
   return(moveInfo)
 }
@@ -108,7 +103,7 @@ runWheresCroc=function(makeMoves,showCroc=T,pause=1) {
     readings=getReadings(positions[1],probs)
     #Loopa igenom alla punkter, för varje gör dnorm, och om det är större än tidigare värdet, lagra, i slutet printa
     # högsta värdet och vilken punkt det var
-    getMostProbableLocation(readings, probs)
+    getNormalizedReadings(readings, probs)
     
     print("READINGS:")
     print(readings)
@@ -141,36 +136,33 @@ getNormalizedReadings = function(readings, probs) {
   largestPointSalinity = 0
   largestPointPhosphate = 0
   largestPointNitrogen = 0
-  largestSalinity = 0
-  largestPhosphate = 0
-  largestNitrogen = 0
+  largestCombined = 0
+  largestPointCombined = 0
+  probabilityContainer = vector("numeric", length=40)
   
   for(i in 1:nrow(probs$salinity)) {
+    
     salinityLatest = dnorm(readings[[1]], probs$salinity[i,1], probs$salinity[i,2])
     phosphateLatest = dnorm(readings[[2]], probs$phosphate[i,1], probs$phosphate[i,2])
     nitrogenLatest = dnorm(readings[[3]], probs$nitrogen[i,1], probs$nitrogen[i,2])
     
-    if (salinityLatest > largestSalinity ) {
-      largestSalinity = salinityLatest
-      largestPointSalinity = i
-    }
-    if (phosphateLatest > largestPhosphate) {
-      largestPhosphate = phosphateLatest
-      largestPointPhosphate = i
-    }
-    if (nitrogenLatest > largestNitrogen ) {
-      largestNitrogen = nitrogenLatest
-      largestPointNitrogen = i
+    combinedLatest = salinityLatest*phosphateLatest*nitrogenLatest
+    probabilityContainer[i] = combinedLatest
+    
+    if (combinedLatest > largestCombined) {
+      largestCombined = combinedLatest
+      largestPointCombined = i
     }
   }
-  print("Finished looping, the largets values of salinity, phosphate and nitrogen are:")
-  print(largestSalinity)
-  print(largestPhosphate)
-  print(largestNitrogen)
-  print("Points of largest values:")
-  print(largestPointSalinity)
-  print(largestPointPhosphate)
-  print(largestPointNitrogen)
+  
+  # Take the list of non-normalized probabilities, normalize each value individually and put these in a new list
+  probabilityContainerNormalized = vector("numeric", length = 40)
+  for(i in 1:length(probabilityContainer)) {
+    nextValue = probabilityContainer[i] / Reduce("+", probabilityContainer)
+    probabilityContainerNormalized[i] = nextValue
+  }
+  
+  return (probabilityContainerNormalized)
 }
 
 #' @export
