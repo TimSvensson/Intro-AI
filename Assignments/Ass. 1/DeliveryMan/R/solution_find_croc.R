@@ -20,7 +20,7 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     #
     if ( length(moveInfo$mem) == 0 )
     {
-        prev_belife = matrix( 1, 1, NUMBER_OF_WATERHOLES )
+        prev_belife = matrix( ( 1 / NUMBER_OF_WATERHOLES ), 1, NUMBER_OF_WATERHOLES )
     }
     else
     {
@@ -53,20 +53,7 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
         }
     }
     
-    #print("prev_belife")
-    #print(prev_belife)
-    
-    #print("observations")
-    #print(observations)
-    
-    diagonal = makeDiagonalMatrix( observations )
-    #print("diagonal")
-    #print(diagonal)
-    
-    crnt_belife = prev_belife %*% diagonal %*% transitions
-    
-    #print("crnt_belife")
-    #print(crnt_belife)
+    crnt_belife = getCurrentBelife( prev_belife, observations, transitions )
     
     print("Most probable waterhole")
     print(which.max(crnt_belife))
@@ -77,6 +64,24 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     print(moveInfo$moves)
     
     return( moveInfo )
+}
+
+getCurrentBelife = function( previouse_belife, observations, transitions )
+{
+    
+    current_belife = previouse_belife %*% makeDiagonalMatrix( observations ) %*% transitions
+    
+    return( current_belife )
+}
+
+forward = function()
+{
+    
+}
+
+backward = function()
+{
+    
 }
 
 getMoves = function( origin, destination, edges )
