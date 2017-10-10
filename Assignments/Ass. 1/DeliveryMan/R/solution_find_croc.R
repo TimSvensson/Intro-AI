@@ -28,6 +28,31 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     }
     observations = getNormalizedReadings( readings, probs )
     
+    if ( !is.na( positions[1] ) )
+    {
+        if ( positions[1] > 0 )
+        {
+            observations[positions[1]] = 0
+        }
+        else
+        {
+            observations = matrix( 0, 1, NUMBER_OF_WATERHOLES )
+            observations[ 1, positions[1] ] = 1
+        }
+    }
+    if ( !is.na( positions[2] ) )
+    {
+        if ( positions[2] > 0 )
+        {
+            observations[positions[2]] = 0
+        }
+        else
+        {
+            observations = matrix( 0, 1, NUMBER_OF_WATERHOLES )
+            observations[ 1, positions[2] ] = 1
+        }
+    }
+    
     #print("prev_belife")
     #print(prev_belife)
     
@@ -47,9 +72,61 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     print(which.max(crnt_belife))
     
     moveInfo$mem = crnt_belife
-    moveInfo$moves=c(sample(getOptions(positions[3],edges),1),0)
+    moveInfo$moves = getMoves( positions[3], which.max(crnt_belife), edges )
+    print("moves")
+    print(moveInfo$moves)
     
     return( moveInfo )
+}
+
+getMoves = function( origin, destination, edges )
+{
+    print("Origin")
+    print(origin)
+    print("Destination")
+    print(destination)
+    
+    moves = vector( "numeric", length=2 )
+    crnt_position = origin
+    
+    for ( i in 1:2 )
+    {
+        if ( crnt_position == destination )
+        {
+            moves[ i ] = 0
+        }
+        else
+        {
+            print("Options")
+            options = getOptions( crnt_position, edges )
+            print(options)
+            
+            if ( is.na( match( destination, options ) ) )
+            {
+                # taken from https://stat.ethz.ch/pipermail/r-help/2008-July/167216.html
+                # which(abs(x-your.number)==min(abs(x-your.number)))
+                
+                d = options - destination
+                print("Difference")
+                print(d)
+                
+                option_i = which( abs( d ) == min( abs( d )))
+                print("Option to choose")
+                print(option_i)
+                print(options[ option_i ])
+                
+                moves[ i ] = options[ option_i ]
+                
+            }
+            else
+            {
+                moves[ i ] = options[ match( destination, options ) ]
+            }
+            crnt_position = moves[ i ]
+        }
+    }
+    
+    return( moves )
 }
 
 makeDiagonalMatrix = function( vector )
