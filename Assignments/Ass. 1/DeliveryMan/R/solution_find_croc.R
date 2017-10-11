@@ -12,19 +12,18 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     # edges     = Matrix
     # probs     = List      { $slainity, $phsosphate, $nitrogen }
     
-    
     transitions = transitions.make( edges )
     
     #
-    # prev_belife = Vector { P( croc at node 1 ), P( croc at node 2 ), ... }
+    # belife.previouse = Vector { P( croc at node 1 ), P( croc at node 2 ), ... }
     #
     if ( length(moveInfo$mem) == 0 )
     {
-        prev_belife = matrix( ( 1 / NUMBER_OF_WATERHOLES ), 1, NUMBER_OF_WATERHOLES )
+        belife.previouse = matrix( ( 1 / NUMBER_OF_WATERHOLES ), 1, NUMBER_OF_WATERHOLES )
     }
     else
     {
-        prev_belife = moveInfo$mem
+        belife.previouse = moveInfo$mem
     }
     observations = getNormalizedReadings( readings, probs )
     
@@ -53,35 +52,36 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
         }
     }
     
-    crnt_belife = getCurrentBelife( prev_belife, observations, transitions )
+    belife.current = getCurrentBelife( belife.previouse, observations, transitions )
     
-    print("Most probable waterhole")
-    print(which.max(crnt_belife))
-    
-    moveInfo$mem = crnt_belife
-    moveInfo$moves = getMoves( positions[3], which.max(crnt_belife), edges )
-    print("moves")
-    print(moveInfo$moves)
+    moveInfo$mem = belife.current
+    moveInfo$moves = bfs( positions[3], which.max(belife.current), edges )
     
     return( moveInfo )
 }
 
-getCurrentBelife = function( previouse_belife, observations, transitions )
+getCurrentBelife = function( belife.previouse, observations, transitions )
 {
+    f = forward( belife.previouse, observations, transitions )
+    b = backward( observations, transitions )
+    belife.current = smooth( f, b )
     
-    current_belife = previouse_belife %*% makeDiagonalMatrix( observations ) %*% transitions
-    
-    return( current_belife )
+    return( belife.current )
 }
 
-forward = function()
+forward = function( belife.previouse, observations, transitions )
 {
-    
+    return( belife.previouse %*% transitions %*% makeDiagonalMatrix( observations ) )
 }
 
-backward = function()
+backward = function( observations, transitions )
 {
-    
+    return( matrix(1,1,NUMBER_OF_WATERHOLES) %*% transitions %*% makeDiagonalMatrix( observations ) )
+}
+
+smooth = function( forward, backward )
+{
+    return( forward * backward )
 }
 
 getMoves = function( origin, destination, edges )
@@ -102,24 +102,14 @@ getMoves = function( origin, destination, edges )
         }
         else
         {
-            print("Options")
             options = getOptions( crnt_position, edges )
-            print(options)
-            
             if ( is.na( match( destination, options ) ) )
             {
                 # taken from https://stat.ethz.ch/pipermail/r-help/2008-July/167216.html
                 # which(abs(x-your.number)==min(abs(x-your.number)))
                 
                 d = options - destination
-                print("Difference")
-                print(d)
-                
                 option_i = which( abs( d ) == min( abs( d )))
-                print("Option to choose")
-                print(option_i)
-                print(options[ option_i ])
-                
                 moves[ i ] = options[ option_i ]
                 
             }
@@ -131,6 +121,67 @@ getMoves = function( origin, destination, edges )
         }
     }
     
+    return( moves )
+}
+
+bfs = function( origin, goal, edges )
+{
+    # visited[i,1] = node
+    # visited[i,2] = previouse node
+    v = matrix( 0, NUMBER_OF_WATERHOLES, 2 )
+    f = matrix( 0, NUMBER_OF_WATERHOLES, 2 )
+    
+    v.pointer = 1
+    f.head = 1
+    f.tail = 2
+    f[1,] = c( origin, 0 )
+    moves = c(0,0)
+    
+    goal.found = FALSE
+    
+    while ( goal.found == FALSE )
+    {   
+        if ( any( v[,1] == goal ) )
+        {
+            # set moves to return
+            origin.found = FALSE
+            node = v[which( v[,1] == goal ),]
+            
+            while ( origin.found == FALSE )
+            {
+                if ( node[1] == origin )
+                {
+                    origin.found = TRUE
+                }
+                else
+                {
+                    moves[2] = moves[1]
+                    moves[1] = node[1]
+                    node = v[which( v[,1] == node[2] ),]
+                }
+            }
+            goal.found = TRUE
+        }
+        else
+        {
+            # 1. Expand frontier using the "top" of the frontier
+            options = getOptions( f[f.head,1], edges )
+            for ( i in 1:length( options ) )
+            {
+                if ( !any( options[i] == v ) &
+                     !any( options[i] == f ) )
+                {
+                    f[f.tail,1] = options[i]
+                    f[f.tail,2] = f[f.head]
+                    f.tail = f.tail + 1
+                }
+            }
+            # 2. Put top of frontier in visited
+            v[v.pointer,] = f[f.head,]
+            v.pointer = v.pointer + 1
+            f.head = f.head + 1
+        }
+    }
     return( moves )
 }
 
@@ -195,8 +246,23 @@ getNormalizedReadings = function(readings, probs) {
     return (probabilityContainerNormalized)
 }
 
+averageTest <- function(tests){
+    sum = 0
+    for (i in 1:tests) {
+        sum=sum+runWheresCroc( makeMoves = Steve_Irwin,
+                               pause = 0)
+        if(i%%10==0){
+            print(i)
+            print(sum/i)
+        }
+    }
+    print(sum/i)
+    return(0)
+}
+
 # 
 # Run
 # 
 
+# averageTest(500)
 runWheresCroc( Steve_Irwin, showCroc=T, pause=1 )
