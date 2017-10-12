@@ -14,16 +14,17 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
     
     transitions = transitions.make( edges )
     
-    #
-    # belife.previouse = Vector { P( croc at node 1 ), P( croc at node 2 ), ... }
-    #
+    # belife[,1] - prev belife
+    # belife[,2] - crnt belife
+    belife = matrix( 0, NUMBER_OF_WATERHOLES, 2 )
+    
     if ( length(moveInfo$mem) == 0 )
     {
-        belife.previouse = matrix( ( 1 / NUMBER_OF_WATERHOLES ), 1, NUMBER_OF_WATERHOLES )
+        belife[,1] = matrix( ( 1 / NUMBER_OF_WATERHOLES ), 1, NUMBER_OF_WATERHOLES )
     }
     else
     {
-        belife.previouse = moveInfo$mem
+        belife[,1] = moveInfo$mem
     }
     observations = getNormalizedReadings( readings, probs )
     
@@ -52,26 +53,39 @@ Steve_Irwin = function( moveInfo, readings, positions, edges, probs )
         }
     }
     
-    belife.current = getCurrentBelife( belife.previouse, observations, transitions )
+    belife = updateBelife( belife, observations, transitions )
     
-    moveInfo$mem = belife.current
-    moveInfo$moves = bfs( positions[3], which.max(belife.current), edges )
+    moveInfo$mem = belife[,2]
+    moveInfo$moves = bfs( positions[3], which.max(belife[,2]), edges )
     
     return( moveInfo )
 }
 
-getCurrentBelife = function( belife.previouse, observations, transitions )
+updateBelife = function( belife, observations, transitions )
 {
-    f = forward( belife.previouse, observations, transitions )
-    b = backward( observations, transitions )
-    belife.current = smooth( f, b )
+    # belife = matrix( p, NUMBER_OF_WATERHOLES, 2 )
+    # observations <- R^(NoW x NoW)
+    # transitions R^(NoW x NoW)
     
-    return( belife.current )
+    f = matrix( as.vector( belife[,1] ),
+                nrow = NUMBER_OF_WATERHOLES,
+                ncol = 2,
+                byrow = TRUE )
+    
+    b = matrix( rep.int(1, 2*NUMBER_OF_WATERHOLES),
+                nrow = NUMBER_OF_WATERHOLES,
+                ncol = 2 )
+    
+    f[,2] = forward( belife[,1], observations, transitions )
+    b[,1] = backward( observations, transitions )
+    belife = smooth( f, b )
+    
+    return( belife )
 }
 
-forward = function( belife.previouse, observations, transitions )
+forward = function( belife, observations, transitions )
 {
-    return( belife.previouse %*% transitions %*% makeDiagonalMatrix( observations ) )
+    return( belife %*% transitions %*% makeDiagonalMatrix( observations ) )
 }
 
 backward = function( observations, transitions )
@@ -79,9 +93,11 @@ backward = function( observations, transitions )
     return( matrix(1,1,NUMBER_OF_WATERHOLES) %*% transitions %*% makeDiagonalMatrix( observations ) )
 }
 
-smooth = function( forward, backward )
+smooth = function( f, b )
 {
-    return( forward * backward )
+    fb = f * b
+    
+    
 }
 
 getMoves = function( origin, destination, edges )
